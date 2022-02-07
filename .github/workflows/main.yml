@@ -1,0 +1,42 @@
+name: Deploy to AWS Elasticbeanstalk
+env:
+  S3_BUCKET: "elasticbeanstalk-ap-northeast-2-463328802866"
+  APPLICATION: "round-table"
+  ENVIRONMENT: "Roundtable-env"
+  PACKAGE: "round-table-${{ github.sha }}.zip"
+  AWS_REGION: "ap-northeast-2"
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v2
+
+      - name: Create zip package
+        run: zip -r ${{env.PACKAGE}} ./ -x *.git*
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Copy package to S3
+        run: aws s3 cp ${{ env.PACKAGE }} s3://${{ env.S3_BUCKET }}/
+
+      - name: Create application version
+        run: |
+          aws elasticbeanstalk create-application-version \
+          --application-name ${{ env.APPLICATION}} \
+          --source-bundle S3Bucket="${{ env.S3_BUCKET }}",S3Key="${{ env.PACKAGE }}" \
+          --version-label "${{ github.sha }}"
+      
+      - name: Update new appliaction
+        run: aws elasticbeanstalk update-environment --environment-name ${{ env.ENVIRONMENT}} --version-label "${{ github.sha }}"
