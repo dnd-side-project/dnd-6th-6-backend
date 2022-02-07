@@ -27,7 +27,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 ALLOWED_HOSTS = ['127.0.0.1']
 if os.environ.get('IS_DEPLOIED'):
     DEBUG = False
-    ALLOWED_HOSTS.append('http://round-table.ap-northeast-2.elasticbeanstalk.com/')
+    ALLOWED_HOSTS.append('round-table.ap-northeast-2.elasticbeanstalk.com')
 else:
     DEBUG = True
 
