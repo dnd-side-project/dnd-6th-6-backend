@@ -18,14 +18,14 @@ class Invite(models.Model):
     inviter = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="invite",
-        related_query_name="invite"
+        related_name="sended_invites",
+        related_query_name="sended_invite"
     )
     invitee = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="invited",
-        related_query_name="invited"
+        related_name="recieved_invites",
+        related_query_name="recieved_invite"
     )
     sended_at = models.DateTimeField(auto_now_add=True)
 
