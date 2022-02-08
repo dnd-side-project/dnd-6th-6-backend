@@ -10,10 +10,11 @@ from houses.serializers import HouseSerializer
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_house(request):
-    # if request.user.profile.house:
-    #     return Response(status=status.HTTP_400_BAD_REQUEST)
+    if request.user.profile.house:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
     serializer = HouseSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save()
+        request.user.profile.house = serializer.save()
+        request.user.profile.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
