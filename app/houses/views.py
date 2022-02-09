@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
+from houses.models import Invite
 from houses.serializers import HouseSerializer, InviteSerializer
 
 
@@ -52,3 +53,19 @@ def invite_member(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(["PATCH"])
+@permission_classes([IsAuthenticated])
+def accept_invite(request):
+    try:
+        invite_id = request.data["invite_id"]
+    except:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    invite = Invite.objects.get(pk=invite_id)
+    if invite.invitee != request.user:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    request.user.profile.house = invite.house
+    request.user.profile.save()
+    return Response(status=status.HTTP_200_OK)
