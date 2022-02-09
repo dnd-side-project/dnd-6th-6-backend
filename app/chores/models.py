@@ -50,7 +50,7 @@ class RepeatChore(models.Model):
         ChoreInfo,
         on_delete=models.CASCADE
     )
-    assignees = models.ForeignKey(
+    assignees = models.ManyToManyField(
         User,
         on_delete=models.CASCADE,
         related_name="repeat_chores",
