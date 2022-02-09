@@ -1,7 +1,8 @@
+from tkinter import CASCADE
 from django.db import models
 from django.contrib.auth.models import User
 
-# Create your models here.
+# Create your models here
 
 
 class Profile(models.Model):
@@ -45,7 +46,9 @@ class Profile(models.Model):
         ("ESFP", "ESFP"),
     )
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="user_profile", null=True
+    )
     house = models.ForeignKey(
         "houses.House",
         on_delete=models.SET_NULL,
@@ -62,6 +65,3 @@ class Profile(models.Model):
     )
     mbti = models.CharField(choices=MBTI_CHOICE, blank=True, max_length=5)
     message = models.TextField(blank=True, max_length=30)
-
-    def __str__(self):
-        return self.user.first_name
