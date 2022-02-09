@@ -1,4 +1,3 @@
-from asyncio.windows_events import NULL
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -13,7 +12,10 @@ class ChoreInfo(models.Model):
     description = models.TextField()
     category = models.ForeignKey(
         Category,
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
+        default=None,
+        blank=True,
+        null=True
     )
 
     def __str__(self):
@@ -34,7 +36,23 @@ class Chore(models.Model):
         related_query_name="chore"
     )
     planned_at = models.DateTimeField()
-    completed_at = models.DateTimeField(default=NULL, blank=True, null=True)
+    completed_at = models.DateTimeField(
+        default=None,
+        blank=True,
+        null=True
+    )
 
     def __str__(self):
         return f"{self.assignee}'s {self.information}"
+
+class RepeatChore(models.Model):
+    information = models.OneToOneField(
+        ChoreInfo,
+        on_delete=models.CASCADE
+    )
+    assignees = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="repeat_chores",
+        related_query_name="has_repeat_chores"
+    )
