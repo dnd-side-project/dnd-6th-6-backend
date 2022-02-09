@@ -1,16 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from houses import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import Profile
+from .serializers import UserSerializer
 from .serializers import UserSerializer, ProfileSerializer
-
 
 USERS = get_user_model()
 
-# Generic CBV 사용
-# 모든 유저
+
 class UserListAPIView(APIView):  # get, post
     def get(self, request):
         serializer = UserSerializer(USERS.objects.all(), many=True)

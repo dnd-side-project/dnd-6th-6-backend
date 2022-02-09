@@ -65,3 +65,11 @@ class Profile(models.Model):
     )
     mbti = models.CharField(choices=MBTI_CHOICE, blank=True, max_length=5)
     message = models.TextField(blank=True, max_length=30)
+
+
+class EmailAuth(models.Model):
+    signup_email = models.EmailField(null=True)
+    code = models.CharField(null=True, max_length=6)
+
+    def __str__(self):
+        return self.signup_email

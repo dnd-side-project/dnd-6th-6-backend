@@ -18,6 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "username",  # 회원가입한 이메일
+            "password",
             "first_name",  # 유저이름
             "user_profile",
         )
