@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+
 # Create your models here.
+
 
 class Profile(models.Model):
     GENDER_MALE = "M"
@@ -42,9 +44,15 @@ class Profile(models.Model):
         ("ESTP", "ESTP"),
         ("ESFP", "ESFP"),
     )
-    
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    house = models.ForeignKey("houses.House", on_delete=models.SET_NULL, null=True, blank=True)
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    house = models.ForeignKey(
+        "houses.House",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="profile",
+    )
 
     gender = models.CharField(choices=GENDER_CHOICES, blank=False, max_length=10)
     # avatar = models.ImageField(blank=True)
@@ -55,6 +63,5 @@ class Profile(models.Model):
     mbti = models.CharField(choices=MBTI_CHOICE, blank=True, max_length=5)
     message = models.TextField(blank=True, max_length=30)
 
-
-
-
+    def __str__(self):
+        return self.user.first_name

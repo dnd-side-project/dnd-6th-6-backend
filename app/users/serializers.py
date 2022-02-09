@@ -10,18 +10,13 @@ class UserSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "username",  # 회원가입한 이메일
-            "first_name",  # 유저이름
+            "first_name",
+            "profile",  # 유저이름
         )
 
 
 # profile
 class ProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-
     class Meta:
         model = Profile
         fields = "__all__"
-
-    @classmethod
-    def setup_preloading(cls, queryset):
-        return queryset.select_related("user")  # join
