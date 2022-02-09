@@ -56,3 +56,7 @@ class RepeatChore(models.Model):
         related_name="repeat_chores",
         related_query_name="has_repeat_chores"
     )
+    days = models.ManyToManyField(Day)
+
+class Day(models.Model):
+    name = models.CharField(max_length=2)
