@@ -12,10 +12,7 @@ class ChoreInfo(models.Model):
     description = models.TextField()
     category = models.ForeignKey(
         Category,
-        on_delete=models.SET_NULL,
-        default=None,
-        blank=True,
-        null=True
+        on_delete=models.CASCADE
     )
 
     def __str__(self):
@@ -45,6 +42,14 @@ class Chore(models.Model):
     def __str__(self):
         return f"{self.assignee}'s {self.information}"
 
+
+class Day(models.Model):
+    name = models.CharField(max_length=2)
+
+    def __str__(self):
+        return self.name
+
+
 class RepeatChore(models.Model):
     information = models.OneToOneField(
         ChoreInfo,
@@ -52,11 +57,7 @@ class RepeatChore(models.Model):
     )
     assignees = models.ManyToManyField(
         User,
-        on_delete=models.CASCADE,
         related_name="repeat_chores",
         related_query_name="has_repeat_chores"
     )
     days = models.ManyToManyField(Day)
-
-class Day(models.Model):
-    name = models.CharField(max_length=2)
