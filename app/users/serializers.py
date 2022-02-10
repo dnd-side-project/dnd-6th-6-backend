@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Profile, User
+from .models import EmailAuth, Profile, User
 
 
 # profile
@@ -22,3 +22,15 @@ class UserSerializer(serializers.ModelSerializer):
             "first_name",  # 유저이름
             "user_profile",
         )
+
+
+class EmailAuthSerializer(serializers.ModelSerializer):
+    def create(self, validated_data):
+        email = validated_data.get("signup_email")
+        code = "138092"  # 난수
+        email_user = EmailAuth.objects.create(signup_email=email, code=code)
+        return email_user
+
+    class Meta:
+        model = EmailAuth
+        fields = "__all__"
