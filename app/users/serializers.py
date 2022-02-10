@@ -1,3 +1,4 @@
+import uuid
 from rest_framework import serializers
 from .models import EmailAuth, Profile, User
 
@@ -24,12 +25,18 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 
+# 이메일 인증
 class EmailAuthSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         email = validated_data.get("signup_email")
-        code = "138092"  # 난수
+        code = str(uuid.uuid4())[:6] 
         email_user = EmailAuth.objects.create(signup_email=email, code=code)
         return email_user
+
+    # private
+    def __send_code(self):
+        pass
+
 
     class Meta:
         model = EmailAuth

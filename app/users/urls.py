@@ -1,6 +1,7 @@
 from django.urls import path
 from users.views import UserViewSet, EmailAuthSet
 
+# users/
 user_list = UserViewSet.as_view(
     {
         "get": "list",  # 유저 목록
@@ -8,6 +9,7 @@ user_list = UserViewSet.as_view(
     }
 )
 
+# users/{user-id}
 user_detail = UserViewSet.as_view(
     {
         "get": "retrieve",  # 해당 유저 조회
@@ -15,9 +17,10 @@ user_detail = UserViewSet.as_view(
     }
 )
 
+# users/email
 email_list = EmailAuthSet.as_view(
     {
-        "get": "list",  # 유저 목록
+        "get": "list",
         "post": "create",
     }
 )
@@ -26,5 +29,5 @@ email_list = EmailAuthSet.as_view(
 urlpatterns = [
     path("", user_list),
     path("<int:pk>/", user_detail),
-    path("signup/", email_list),
+    path("email/", email_list),
 ]
