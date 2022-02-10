@@ -3,9 +3,9 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from chores.models import Chore
+from chores.models import Chore, RepeatChore
 from chores.permissions import IsHouseMember
-from chores.serializers import ChoreSerializer, ChoreInfoSerializer
+from chores.serializers import ChoreSerializer, ChoreInfoSerializer, RepeatChoreSerializer
 
 
 class ChoreViewSet(viewsets.ModelViewSet):
@@ -102,3 +102,9 @@ class ChoreViewSet(viewsets.ModelViewSet):
         
         serializer = self.get_serializer(queryset_for_house, many=True)
         return Response(serializer.data)
+
+
+class RepeatChoreViewSet(viewsets.ModelViewSet):
+    queryset = RepeatChore.objects.all()
+    serializer = RepeatChoreSerializer
+    permission_classes = [IsAuthenticated, IsHouseMember]
