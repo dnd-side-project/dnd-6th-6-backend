@@ -3,13 +3,16 @@ from django.core.mail import EmailMessage
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from .serializers import (
     UserSerializer,
     ProfileSerializer,
     EmailAuthSerializer,
     CreateUserSerializer,
+    TokenUserSerializer,
 )
+
 from .models import Profile, EmailAuth
 
 USERS = get_user_model()
@@ -47,6 +50,7 @@ class UserCreateViewSet(viewsets.ModelViewSet):
     queryset = USERS.objects.all()
     serializer_class = CreateUserSerializer
 
+    # post 회원가입
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         pw = request.data["password"]
@@ -58,3 +62,19 @@ class UserCreateViewSet(viewsets.ModelViewSet):
                 return Response(status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class TokenViewSet(viewsets.ModelViewSet):
+    serializer_class = TokenUserSerializer
+
+    @action(detail=False, methods=["POST"])
+    def log_in(self, request):
+        serializer = self.get_serializer(data=request.data)
+
+        if not serializer.is_valid(raise_exception=True):
+            return Response(status=status.HTTP_409_CONFLICT)
+        if serializer.validated_data["login_id"] == "None":
+            return Response(data="로그인 실패", status=status.HTTP_400_BAD_REQUEST)
+
+        response = {"success": "True", "token": serializer.data["token"]}
+        return Response(response, status=status.HTTP_200_OK)
