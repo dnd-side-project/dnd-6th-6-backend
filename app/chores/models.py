@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+from houses.models import House
+
 class Category(models.Model):
     name = models.CharField(max_length=10, unique=True)
 
@@ -10,9 +12,14 @@ class Category(models.Model):
 class ChoreInfo(models.Model):
     name = models.CharField(max_length=10)
     description = models.TextField()
+    house = models.ForeignKey(
+        House,
+        on_delete=models.CASCADE
+    )
     category = models.ForeignKey(
         Category,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        default=1
     )
 
     def __str__(self):
