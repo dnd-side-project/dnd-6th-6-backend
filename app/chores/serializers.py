@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from chores.models import Category, ChoreInfo, Chore
+from chores.models import Category, ChoreInfo, Chore, Day,RepeatChore
 from users.serializers import UserSerializer
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -25,6 +25,16 @@ class ChoreSerializer(serializers.ModelSerializer):
         fields = ["id", "assignee", "information", "planned_at", "completed_at"]
 
 
+class DaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Day
+        fields = ["id", "name"]
+
 class RepeatChoreSerializer(serializers.ModelSerializer):
     information = ChoreInfoSerializer()
     assignees = UserSerializer(read_only=True, many=True)
+    days = DaySerializer(read_only=True, many=True)
+
+    class Meta:
+        model = RepeatChore
+        fields = ["information", "assignees", "days"]
