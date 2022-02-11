@@ -23,9 +23,13 @@ class ChoreViewSet(viewsets.ModelViewSet):
     serializer_class = ChoreSerializer
     permission_classes = [IsAuthenticated, IsHouseMember]
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request, house_id, *args, **kwargs):
+        today = get_today()
         queryset = self.filter_queryset(self.get_queryset())
-        queryset_for_house = queryset.filter(assignee__user_profile__house=request.user.user_profile.house)
+        queryset_for_house = queryset.filter(
+            information__house_id=house_id,
+            planned_at__gte=today
+        )
 
         page = self.paginate_queryset(queryset_for_house)
         if page is not None:
