@@ -4,7 +4,12 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from .serializers import UserSerializer, ProfileSerializer, EmailAuthSerializer
+from .serializers import (
+    UserSerializer,
+    ProfileSerializer,
+    EmailAuthSerializer,
+    CreateUserSerializer,
+)
 from .models import Profile, EmailAuth
 
 USERS = get_user_model()
@@ -24,6 +29,7 @@ class EmailAuthSet(viewsets.ModelViewSet):  # POST
         signup_email = serializer.validated_data["signup_email"]
         code = self.__send_code(signup_email)
         serializer.save(code=code)
+        return Response(data="인증코드가 전송되었습니다.", status=status.HTTP_200_OK)
 
     # 인증코드 전송
     def __send_code(self, email):
@@ -35,3 +41,20 @@ class EmailAuthSet(viewsets.ModelViewSet):  # POST
         )
         email.send()
         return code
+
+
+class UserCreateViewSet(viewsets.ModelViewSet):
+    queryset = USERS.objects.all()
+    serializer_class = CreateUserSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        pw = request.data["password"]
+        ck_pw = request.data["ck_password"]
+
+        if pw == ck_pw:
+            if serializer.is_valid(raise_exception=True):
+                self.perform_create(serializer)
+                return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)

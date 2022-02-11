@@ -24,6 +24,27 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 
+class CreateUserSerializer(serializers.ModelSerializer):
+    ck_password = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = (
+            "username",
+            "password",
+            "ck_password",
+        )
+
+    def create(self, validated_data):
+        username = validated_data["username"]
+        pw = validated_data["password"]
+        user = User.objects.create(
+            username=username,  # 이메일
+        )
+        user.set_password(pw)
+        return user
+
+
 # 이메일 인증
 class EmailAuthSerializer(serializers.ModelSerializer):
     class Meta:
