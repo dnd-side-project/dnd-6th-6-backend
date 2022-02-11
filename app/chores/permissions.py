@@ -2,13 +2,14 @@ from rest_framework.permissions import BasePermission
 
 class IsHouseMember(BasePermission):
     def has_permission(self, request, view):
-        if not request.user.profile.house:
-            return False
-
-        return True
-
+        profile = request.user.user_profile
+        requested_house_id = int(view.kwargs["house_id"])
+        return bool(
+            profile and
+            profile.house and
+            profile.house.id == requested_house_id
+        )
+    
     def has_object_permission(self, request, view, obj):
-        if request.user.profile.house != obj.assignee.profile.house:
-            return False
-        
-        return True
+        requested_house_id = int(view.kwargs["house_id"])
+        return bool(obj.information.house.id == requested_house_id)

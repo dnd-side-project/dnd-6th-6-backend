@@ -3,9 +3,9 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from chores.models import Chore
+from chores.models import Chore, RepeatChore
 from chores.permissions import IsHouseMember
-from chores.serializers import ChoreSerializer, ChoreInfoSerializer
+from chores.serializers import ChoreSerializer, ChoreInfoSerializer, RepeatChoreSerializer
 
 
 class ChoreViewSet(viewsets.ModelViewSet):
@@ -15,7 +15,7 @@ class ChoreViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        queryset_for_house = queryset.filter(assignee__profile__house=request.user.profile.house)
+        queryset_for_house = queryset.filter(assignee__user_profile__house=request.user.user_profile.house)
 
         page = self.paginate_queryset(queryset_for_house)
         if page is not None:
@@ -77,7 +77,7 @@ class ChoreViewSet(viewsets.ModelViewSet):
     def mine(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         queryset_for_house = queryset.filter(
-            assignee__profile__house=request.user.profile.house
+            assignee__user_profile__house=request.user.user_profile.house
         ).filter(assignee=request.user)
 
         page = self.paginate_queryset(queryset_for_house)
@@ -92,7 +92,7 @@ class ChoreViewSet(viewsets.ModelViewSet):
     def others(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         queryset_for_house = queryset.filter(
-            assignee__profile__house=request.user.profile.house
+            assignee__user_profile__house=request.user.user_profile.house
         ).exclude(assignee=request.user)
 
         page = self.paginate_queryset(queryset_for_house)
@@ -102,3 +102,79 @@ class ChoreViewSet(viewsets.ModelViewSet):
         
         serializer = self.get_serializer(queryset_for_house, many=True)
         return Response(serializer.data)
+
+
+class RepeatChoreViewSet(viewsets.ModelViewSet):
+    queryset = RepeatChore.objects.all()
+    serializer_class = RepeatChoreSerializer
+    permission_classes = [IsAuthenticated, IsHouseMember]
+
+    def list(self, request, house_id, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset_for_house = queryset.filter(information__house_id=house_id)
+
+        page = self.paginate_queryset(queryset_for_house)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset_for_house, many=True)
+        return Response(serializer.data)
+    
+    def create(self, request, house_id, *args, **kwargs):
+        information = request.data.get("information", dict())
+        category = information.get("category", {"id": 1})
+        serializer_for_chore_info = ChoreInfoSerializer(data=information)
+        serializer_for_chore_info.is_valid(raise_exception=True)
+        chore_info = serializer_for_chore_info.save(
+            house_id=house_id,
+            category_id=category["id"]
+        )
+        
+        assignees = request.data.get("assignees", [request.user.id])
+        days = request.data.get("days", [1])
+        serializer_for_chore = self.get_serializer(data=request.data)
+        serializer_for_chore.is_valid(raise_exception=True)
+        serializer_for_chore.save(
+            assignees=assignees,
+            information=chore_info,
+            days=days
+        )
+
+        headers = self.get_success_headers(serializer_for_chore.data)
+        return Response(data=serializer_for_chore.data, status=status.HTTP_201_CREATED, headers=headers)
+    
+    def update(self, request, house_id, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+        information = request.data.get("information", dict())
+        serializer_for_chore_info = ChoreInfoSerializer(
+            instance.information,
+            data=information,
+            partial=partial
+        )
+        serializer_for_chore_info.is_valid(raise_exception=True)
+        category = information.get("category", {"id": 1})
+        chore_info = serializer_for_chore_info.save(
+            house_id=house_id,
+            category_id=category["id"]
+        )
+
+        serializer_for_chore = self.get_serializer(
+            instance,
+            data=request.data,
+            partial=partial
+        )
+        serializer_for_chore.is_valid(raise_exception=True)
+        assignees = request.data.get("assignees", instance.assignees)
+        days = request.data.get("days", instance.days)
+        serializer_for_chore.save(
+            assignees=assignees,
+            information=chore_info,
+            days=days
+        )
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            instance._prefetched_objects_cache = {}
+        
+        return Response(serializer_for_chore.data)
