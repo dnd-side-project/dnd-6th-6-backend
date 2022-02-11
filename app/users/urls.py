@@ -1,5 +1,5 @@
 from django.urls import path, include
-from users.views import UserViewSet, EmailAuthSet, UserCreateViewSet, TokenViewSet
+from users.views import UserViewSet, EmailAuthSet, log_in, sign_up
 
 # from rest_framework_simpletwt.views import
 # users/
@@ -31,8 +31,8 @@ urlpatterns = [
     path("", user_list),
     path("<int:pk>/", user_detail),
     path("email/", email_list),
-    path("signup/", UserCreateViewSet.as_view({"post": "create"})),
-    path("login/", TokenViewSet.as_view({"post": "log_in"}))
+    path("signup/", sign_up),
+    path("login/", log_in)
     #    path("dj-account/", include("dj_rest_auth.urls")),  # 로그인, 로그아웃
     #    path("dj-signup/", include("dj_rest_auth.registration.urls")),  # 회원가입
     #    path("accounts/", include("allauth.urls")),
