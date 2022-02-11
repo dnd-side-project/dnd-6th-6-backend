@@ -22,7 +22,7 @@ from chores.views import ChoreViewSet, RepeatChoreViewSet
 
 router = routers.DefaultRouter()
 router.register(r'chores', ChoreViewSet)
-router.register(r'repeat-chores', RepeatChoreViewSet)
+router.register(r'houses/(?P<house_id>\d+)/repeat-chores', RepeatChoreViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
