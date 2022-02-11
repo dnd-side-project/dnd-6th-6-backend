@@ -103,10 +103,13 @@ class ChoreViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
     @action(methods=["GET"], detail=False)
-    def others(self, request, *args, **kwargs):
+    def others(self, request, house_id, *args, **kwargs):
+        today = get_today()
         queryset = self.filter_queryset(self.get_queryset())
         queryset_for_house = queryset.filter(
-            assignee__user_profile__house=request.user.user_profile.house
+            information__house_id=house_id,
+            planned_at__gte=today,
+            planned_at__lte=today+datetime.timedelta(days=1)
         ).exclude(assignee=request.user)
 
         page = self.paginate_queryset(queryset_for_house)
