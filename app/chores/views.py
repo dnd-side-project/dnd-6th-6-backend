@@ -142,4 +142,39 @@ class RepeatChoreViewSet(viewsets.ModelViewSet):
         )
 
         headers = self.get_success_headers(serializer_for_chore.data)
-        return Response(data=serializer_for_chore.data, status=status.HTTP_201_CREATED, headers=headers) 
+        return Response(data=serializer_for_chore.data, status=status.HTTP_201_CREATED, headers=headers)
+    
+    def update(self, request, house_id, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+        information = request.data.get("information", dict())
+        serializer_for_chore_info = ChoreInfoSerializer(
+            instance.information,
+            data=information,
+            partial=partial
+        )
+        serializer_for_chore_info.is_valid(raise_exception=True)
+        category = information.get("category", {"id": 1})
+        chore_info = serializer_for_chore_info.save(
+            house_id=house_id,
+            category_id=category["id"]
+        )
+
+        serializer_for_chore = self.get_serializer(
+            instance,
+            data=request.data,
+            partial=partial
+        )
+        serializer_for_chore.is_valid(raise_exception=True)
+        assignees = request.data.get("assignees", instance.assignees)
+        days = request.data.get("days", instance.days)
+        serializer_for_chore.save(
+            assignees=assignees,
+            information=chore_info,
+            days=days
+        )
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            instance._prefetched_objects_cache = {}
+        
+        return Response(serializer_for_chore.data)
