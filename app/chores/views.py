@@ -109,9 +109,9 @@ class RepeatChoreViewSet(viewsets.ModelViewSet):
     serializer_class = RepeatChoreSerializer
     permission_classes = [IsAuthenticated, IsHouseMember]
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request, house_id, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        queryset_for_house = queryset.filter(assignees__user_profile__house=request.user.user_profile.house)
+        queryset_for_house = queryset.filter(information__house_id=house_id)
 
         page = self.paginate_queryset(queryset_for_house)
         if page is not None:
@@ -120,3 +120,26 @@ class RepeatChoreViewSet(viewsets.ModelViewSet):
         
         serializer = self.get_serializer(queryset_for_house, many=True)
         return Response(serializer.data)
+    
+    def create(self, request, house_id, *args, **kwargs):
+        information = request.data.get("information", dict())
+        category = information.get("category", {"id": 1})
+        serializer_for_chore_info = ChoreInfoSerializer(data=information)
+        serializer_for_chore_info.is_valid(raise_exception=True)
+        chore_info = serializer_for_chore_info.save(
+            house_id=house_id,
+            category_id=category["id"]
+        )
+        
+        assignees = request.data.get("assignees", [request.user.id])
+        days = request.data.get("days", [1])
+        serializer_for_chore = self.get_serializer(data=request.data)
+        serializer_for_chore.is_valid(raise_exception=True)
+        serializer_for_chore.save(
+            assignees=assignees,
+            information=chore_info,
+            days=days
+        )
+
+        headers = self.get_success_headers(serializer_for_chore.data)
+        return Response(data=serializer_for_chore.data, status=status.HTTP_201_CREATED, headers=headers) 
