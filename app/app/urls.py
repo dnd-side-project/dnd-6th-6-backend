@@ -18,10 +18,11 @@ from django.urls import include, path
 
 from rest_framework import routers
 
-from chores.views import ChoreViewSet
+from chores.views import ChoreViewSet, RepeatChoreViewSet
 
 router = routers.DefaultRouter()
 router.register(r'chores', ChoreViewSet)
+router.register(r'repeat-chores', RepeatChoreViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
