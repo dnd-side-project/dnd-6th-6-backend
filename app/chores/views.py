@@ -1,3 +1,6 @@
+import datetime
+from django.utils import timezone
+
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -7,6 +10,13 @@ from chores.models import Chore, RepeatChore
 from chores.permissions import IsHouseMember
 from chores.serializers import ChoreSerializer, ChoreInfoSerializer, RepeatChoreSerializer
 
+def get_today():
+    now = timezone.now()
+    year = now.year
+    month = now.month
+    day = now.day
+
+    return datetime.date(year, month, day)
 
 class ChoreViewSet(viewsets.ModelViewSet):
     queryset = Chore.objects.all()
@@ -74,11 +84,14 @@ class ChoreViewSet(viewsets.ModelViewSet):
         return Response(serializer_for_chore.data)
     
     @action(methods=["GET"], detail=False)
-    def mine(self, request, *args, **kwargs):
+    def mine(self, request, house_id, *args, **kwargs):
+        today = get_today()
         queryset = self.filter_queryset(self.get_queryset())
         queryset_for_house = queryset.filter(
-            assignee__user_profile__house=request.user.user_profile.house
-        ).filter(assignee=request.user)
+            information__house_id=house_id,
+            planned_at__gte=today,
+            planned_at__lte=today+datetime.timedelta(days=1)
+        )
 
         page = self.paginate_queryset(queryset_for_house)
         if page is not None:
