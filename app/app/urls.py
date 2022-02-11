@@ -21,7 +21,7 @@ from rest_framework import routers
 from chores.views import ChoreViewSet, RepeatChoreViewSet
 
 router = routers.DefaultRouter()
-router.register(r'chores', ChoreViewSet)
+router.register(r'houses/(?P<house_id>\d+)/chores', ChoreViewSet)
 router.register(r'houses/(?P<house_id>\d+)/repeat-chores', RepeatChoreViewSet)
 
 urlpatterns = [
