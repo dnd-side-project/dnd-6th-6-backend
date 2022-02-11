@@ -15,7 +15,7 @@ class ChoreViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        queryset_for_house = queryset.filter(assignee__profile__house=request.user.profile.house)
+        queryset_for_house = queryset.filter(assignee__user_profile__house=request.user.user_profile.house)
 
         page = self.paginate_queryset(queryset_for_house)
         if page is not None:
@@ -77,7 +77,7 @@ class ChoreViewSet(viewsets.ModelViewSet):
     def mine(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         queryset_for_house = queryset.filter(
-            assignee__profile__house=request.user.profile.house
+            assignee__user_profile__house=request.user.user_profile.house
         ).filter(assignee=request.user)
 
         page = self.paginate_queryset(queryset_for_house)
@@ -92,7 +92,7 @@ class ChoreViewSet(viewsets.ModelViewSet):
     def others(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         queryset_for_house = queryset.filter(
-            assignee__profile__house=request.user.profile.house
+            assignee__user_profile__house=request.user.user_profile.house
         ).exclude(assignee=request.user)
 
         page = self.paginate_queryset(queryset_for_house)
@@ -106,5 +106,17 @@ class ChoreViewSet(viewsets.ModelViewSet):
 
 class RepeatChoreViewSet(viewsets.ModelViewSet):
     queryset = RepeatChore.objects.all()
-    serializer = RepeatChoreSerializer
+    serializer_class = RepeatChoreSerializer
     permission_classes = [IsAuthenticated, IsHouseMember]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset_for_house = queryset.filter(assignees__user_profile__house=request.user.user_profile.house)
+
+        page = self.paginate_queryset(queryset_for_house)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset_for_house, many=True)
+        return Response(serializer.data)
