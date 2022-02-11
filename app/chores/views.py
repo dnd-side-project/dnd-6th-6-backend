@@ -89,6 +89,7 @@ class ChoreViewSet(viewsets.ModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         queryset_for_house = queryset.filter(
             information__house_id=house_id,
+            assignee=request.user,
             planned_at__gte=today,
             planned_at__lte=today+datetime.timedelta(days=1)
         )
