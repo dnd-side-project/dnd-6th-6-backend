@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from chores.models import Category, ChoreInfo, Chore, Day,RepeatChore
+from houses.serializers import HouseSerializer
 from users.serializers import UserSerializer
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -9,11 +10,12 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ["id", "name"]
 
 class ChoreInfoSerializer(serializers.ModelSerializer):
+    house = HouseSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
 
     class Meta:
         model = ChoreInfo
-        fields = ["id", "name", "description", "category"]
+        fields = ["id", "name", "description", "house", "category"]
 
 
 class ChoreSerializer(serializers.ModelSerializer):
