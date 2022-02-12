@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path
 from users.views import UserViewSet, EmailAuthSet, sign_up, auth_code, log_in, profile
 
 # from rest_framework_simpletwt.views import

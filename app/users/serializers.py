@@ -11,41 +11,61 @@ from django.core.mail import EmailMessage
 
 
 # jwt 사용
-JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER
-JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
-
+# JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER
+# JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
 # from rest_framework_simplejwt.tokens import RefreshToken
 
-# profile
+# get profile
 class ProfileSerializer(serializers.ModelSerializer):
-    def save(self):
-        username = self.request.data["signup_email"]
+    class Meta:
+        model = Profile
+        exclude = ("user",)
 
-        gender = self.validated_data["gender"]
+
+# 회원가입시 프로필
+class SignupProfileSerializer(serializers.ModelSerializer):
+    signup_email = serializers.CharField(max_length=20)  # 이메일
+    # name = serializers.CharField(max_length=20)  # 이름
+
+    def save(self):
+        signup_email = self.validated_data["signup_email"]
+        # name = self.validated_data["name"]
+
+        # gender = self.validated_data["gender"]
         # avatar = models.ImageField(blank=True)
-        life_pattern = self.validated_data["life_pattern"]
-        disposition = self.validated_data["disposition"]
-        mbti = self.validated_data["mbti"]
+        # life_pattern = self.validated_data["life_pattern"]
+        # disposition = self.validated_data["disposition"]
+        # mbti = self.validated_data["mbti"]
         message = self.validated_data["message"]
 
-        user = User.objects.get(username=username)
-        profile = user.profile.update(
-            gender=gender,
-            life_pattern=life_pattern,
-            disposition=disposition,
-            mbti=mbti,
+        user = User.objects.get(username=signup_email)
+        # user.update(first_name=name)
+
+        profile = Profile.objects.filter(user=user).update(  # 역참조
+            # gender=gender,
+            # life_pattern=life_pattern,
+            # disposition=disposition,
+            # mbti=mbti,
             message=message,
         )
         return profile
 
     class Meta:
         model = Profile
-        exclude = ("user",)
+        fields = (
+            "signup_email",
+            # "name",
+            # "gender",
+            # "life_pattern",
+            # "disposition",
+            # "mbti",
+            "message",
+        )
 
 
 # user
 class UserSerializer(serializers.ModelSerializer):
-    user_profile = ProfileSerializer(read_only=True)
+    profile = ProfileSerializer(source="user_profile", read_only=True)
 
     class Meta:
         model = User
@@ -53,7 +73,7 @@ class UserSerializer(serializers.ModelSerializer):
             "id",
             "username",  # 회원가입한 이메일
             "first_name",  # 유저이름
-            "user_profile",
+            "profile",
         )
 
 
@@ -100,7 +120,7 @@ class CreateUserSerializer(serializers.Serializer):
         hashed_pw = make_password(pw)
         user = User.objects.create_user(username=signup_email, password=hashed_pw)
         Token.objects.create(user=user)  # 토큰 생성
-        Profile.objects.create(user=user)
+        Profile.objects.create(user=user)  # 프로필 생성
         return user
 
 
