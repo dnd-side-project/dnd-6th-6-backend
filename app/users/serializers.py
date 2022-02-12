@@ -1,3 +1,4 @@
+import uuid
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 from .models import EmailAuth, Profile, User
@@ -6,6 +7,7 @@ from django.contrib.auth.models import update_last_login
 from rest_framework_jwt.settings import api_settings
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.hashers import check_password
+from django.core.mail import EmailMessage
 
 
 # jwt 사용
@@ -13,7 +15,6 @@ JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER
 JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
 
 # from rest_framework_simplejwt.tokens import RefreshToken
-
 
 # profile
 class ProfileSerializer(serializers.ModelSerializer):
@@ -36,62 +37,58 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 
-# 회원가입
-class CreateUserSerializer(serializers.ModelSerializer):
-    ck_password = serializers.CharField(required=True)
-
-    class Meta:
-        model = User
-        fields = (
-            "username",
-            "password",
-            "ck_password",
-        )
-
-    def create(self, validated_data):
-        username = validated_data["username"]
-        pw = validated_data["password"]
-        hashed_pw = make_password(pw)
-        user = User.objects.create_user(username=username, password=hashed_pw)  # 이메일
-        Token.objects.create(user=user)
-        return user
-
-
-# 로그인
-class TokenUserSerializer(serializers.ModelSerializer):
-    login_id = serializers.CharField(max_length=20)
-    login_pw = serializers.CharField(max_length=50)
-    token = serializers.CharField(max_length=255, read_only=True)
-
-    def validate(self, data):
-        login_id = data["login_id"]
-        pw = data["login_pw"]
-        user = authenticate(username=login_id, password=pw)
-
-        if user is None:
-            return {"login_id": "None"}
-        else:
-            # payload = JWT_PAYLOAD_HANDLER(user)
-            # jwt_token = JWT_ENCODE_HANDLER(payload)
-            try:
-                token = Token.objects.get(user_id=user.id)
-            except Token.DoesNotExist:
-                token = Token.objects.create(user=user)
-            # update_last_login(None, user)
-
-            return {"login_id": user.username, "token": token.key}
-
-    class Meta:
-        model = User
-        fields = (
-            "login_id",
-            "login_pw",
-            "token",
-        )
-
-
 # 이메일 인증
 class EmailAuthSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmailAuth
         fields = ("signup_email",)
+
+    def create(self, validated_data):
+        signup_email = validated_data["signup_email"]
+        code = self.__send_code(signup_email)
+        emailauth = EmailAuth.objects.create(signup_email=signup_email, code=code)
+        return emailauth
+
+    # 인증코드 전송
+    def __send_code(self, auth_email):
+        code = str(uuid.uuid4())[:6]  # 초대코드
+        auth_email = EmailMessage(
+            "Rountable 회원가입 인증코드",  # 제목
+            "인증코드: " + code,  # 본문
+            to=[auth_email],  # 수신자 이메일
+        )
+        auth_email.send()
+        return code
+
+
+# 회원가입
+class CreateUserSerializer(serializers.ModelSerializer):
+    signup_email = serializers.CharField(max_length=20)
+    ck_password = serializers.CharField(max_length=20, required=True)
+
+    class Meta:
+        model = User
+        fields = (
+            "signup_email",
+            "password",
+            "ck_password",
+        )
+
+    def create(self, validated_data):
+        signup_email = validated_data["signup_email"]
+        pw = validated_data["password"]
+        hashed_pw = make_password(pw)
+        user = User.objects.create_user(username=signup_email, password=hashed_pw)
+        Token.objects.create(user=user)  # 토큰 생성
+        Profile.objects.create(user=user)
+        return user
+
+
+# 로그인
+class TokenUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "username",
+            "password",
+        )
