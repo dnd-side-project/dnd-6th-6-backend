@@ -73,15 +73,15 @@ def sign_up(request):  # request signup_email , password, ck_password
 
 # 프로필 입력
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
 def profile(request):
     serializer = ProfileSerializer(data=request.data)
-    if serializer.is_valid():
-        request.user.profile = serializer.save()
-        request.user.save()
-        return Response(status=status.HTTP_200_OK)
-    else:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    if request.method == "POST":  # request signup_email, profile
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_200_OK)  # 성공
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 # 로그인

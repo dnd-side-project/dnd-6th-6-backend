@@ -18,6 +18,26 @@ JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
 
 # profile
 class ProfileSerializer(serializers.ModelSerializer):
+    def save(self):
+        username = self.request.data["signup_email"]
+
+        gender = self.validated_data["gender"]
+        # avatar = models.ImageField(blank=True)
+        life_pattern = self.validated_data["life_pattern"]
+        disposition = self.validated_data["disposition"]
+        mbti = self.validated_data["mbti"]
+        message = self.validated_data["message"]
+
+        user = User.objects.get(username=username)
+        profile = user.profile.update(
+            gender=gender,
+            life_pattern=life_pattern,
+            disposition=disposition,
+            mbti=mbti,
+            message=message,
+        )
+        return profile
+
     class Meta:
         model = Profile
         exclude = ("user",)
@@ -62,7 +82,7 @@ class EmailAuthSerializer(serializers.ModelSerializer):
 
 
 # 회원가입
-class CreateUserSerializer(serializers.ModelSerializer):
+class CreateUserSerializer(serializers.Serializer):
     signup_email = serializers.CharField(max_length=20)
     ck_password = serializers.CharField(max_length=20, required=True)
 
