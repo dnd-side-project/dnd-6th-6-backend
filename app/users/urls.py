@@ -2,10 +2,10 @@ from django.urls import path, include
 from users.views import (
     UserViewSet,
     EmailAuthSet,
-    sign_up,
-    auth_code,
-    log_in,
-    log_out,
+    password,
+    code,
+    login,
+    logout,
     profile,
     test,
 )
@@ -40,10 +40,10 @@ urlpatterns = [
     path("", user_list),
     path("<int:pk>/", user_detail),
     path("email/", email_list),
-    path("signup/", sign_up),
-    path("auth/", auth_code),
+    path("password/", password),
+    path("code/", code),
     path("profile/", profile),
-    path("login/", log_in),
-    path("logout/", log_out),
+    path("login/", login),
+    path("logout/", logout),
     path("test/", test),  # test
 ]

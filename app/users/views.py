@@ -36,7 +36,7 @@ class EmailAuthSet(viewsets.ModelViewSet):
 
 # 2. 인증코드 인증
 @api_view(["POST"])
-def auth_code(request):  # request code
+def code(request):  # request code
     code = request.data["code"]
     auth_code = EmailAuth.objects.filter(code=code)
 
@@ -44,9 +44,7 @@ def auth_code(request):  # request code
         auth_code.update(using=False)
 
         return Response(
-            data={
-                "signup_email": auth_code.signup_email,
-            },
+            data={"signup_email": auth_code[0].signup_email},
             status=status.HTTP_200_OK,
         )  # 인증성공
     else:
@@ -56,7 +54,7 @@ def auth_code(request):  # request code
 # {"signup_email":"test2@email.com","password":"xptmxmdlqslek","ck_password":"xptmxmdlqslek"}
 # 3. 회원가입
 @api_view(["POST"])
-def sign_up(request):  # request signup_email , password, ck_password
+def password(request):  # request signup_email , password, ck_password
     serializer = CreateUserSerializer(data=request.data)
     pw = request.data["password"]
     ck_pw = request.data["ck_password"]
@@ -87,7 +85,7 @@ def profile(request):
 # {"login_email":"test2@email.com","password":"xptmxmdlqslek"}
 # 로그인
 @api_view(["POST"])
-def log_in(request):
+def login(request):
     if request.method == "POST":
         login_id = request.data["login_email"]
         login_pw = request.data["password"]
@@ -105,7 +103,7 @@ def log_in(request):
 # 로그아웃
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def log_out(request):
+def logout(request):
     logout(request)
     return Response(data="로그아웃 성공", status=status.HTTP_200_OK)
 

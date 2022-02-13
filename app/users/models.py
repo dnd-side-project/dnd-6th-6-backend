@@ -67,7 +67,7 @@ class Profile(models.Model):
     message = models.TextField(blank=True, max_length=30)
 
     def __str__(self):
-        return f"{self.user.username}"
+        return f"{self.user}"
 
 
 class EmailAuth(models.Model):
@@ -76,4 +76,4 @@ class EmailAuth(models.Model):
     using = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.code} :: {self.usig}"
+        return f"{self.code} :: {self.using}"
