@@ -25,28 +25,20 @@ class ProfileSerializer(serializers.ModelSerializer):
 # 회원가입시 프로필
 class SignupProfileSerializer(serializers.ModelSerializer):
     signup_email = serializers.CharField(max_length=20)  # 이메일
-    # name = serializers.CharField(max_length=20)  # 이름
+    name = serializers.CharField(max_length=20)  # 이름
 
-    def save(self):
-        signup_email = self.validated_data["signup_email"]
-        # name = self.validated_data["name"]
+    def save(self, validated_data):
+        signup_email = validated_data["signup_email"]
 
-        # gender = self.validated_data["gender"]
-        # avatar = models.ImageField(blank=True)
-        # life_pattern = self.validated_data["life_pattern"]
-        # disposition = self.validated_data["disposition"]
-        # mbti = self.validated_data["mbti"]
-        message = self.validated_data["message"]
+        user = User.objects.filter(username=signup_email)
+        user.update(first_name=validated_data["name"])
 
-        user = User.objects.get(username=signup_email)
-        # user.update(first_name=name)
-
-        profile = Profile.objects.filter(user=user).update(  # 역참조
-            # gender=gender,
-            # life_pattern=life_pattern,
-            # disposition=disposition,
-            # mbti=mbti,
-            message=message,
+        profile = Profile.objects.filter(user=user).update(
+            gender=validated_data["gender"],
+            life_pattern=validated_data["life_pattern"],
+            disposition=validated_data["disposition"],
+            mbti=validated_data["mbti"],
+            message=validated_data["message"],
         )
         return profile
 
@@ -54,16 +46,16 @@ class SignupProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = (
             "signup_email",
-            # "name",
-            # "gender",
-            # "life_pattern",
-            # "disposition",
-            # "mbti",
+            "name",
+            "gender",
+            "life_pattern",
+            "disposition",
+            "mbti",
             "message",
         )
 
 
-# user
+# 전체 유저, 해당 유저
 class UserSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(source="user_profile", read_only=True)
 
@@ -104,6 +96,7 @@ class EmailAuthSerializer(serializers.ModelSerializer):
 # 회원가입
 class CreateUserSerializer(serializers.Serializer):
     signup_email = serializers.CharField(max_length=20)
+    password = serializers.CharField(max_length=20)
     ck_password = serializers.CharField(max_length=20, required=True)
 
     class Meta:
@@ -118,17 +111,9 @@ class CreateUserSerializer(serializers.Serializer):
         signup_email = validated_data["signup_email"]
         pw = validated_data["password"]
         hashed_pw = make_password(pw)
-        user = User.objects.create_user(username=signup_email, password=hashed_pw)
-        Token.objects.create(user=user)  # 토큰 생성
+        user = User(username=signup_email, password=hashed_pw)
+        user.save()
+
+        # Token.objects.get_or_create(user=user)  # 토큰 생성
         Profile.objects.create(user=user)  # 프로필 생성
         return user
-
-
-# 로그인
-class TokenUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = (
-            "username",
-            "password",
-        )

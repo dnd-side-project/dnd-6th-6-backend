@@ -28,22 +28,22 @@ class Profile(models.Model):
     )
 
     MBTI_CHOICE = (
-        ("INTJ", "INTJ"),
-        ("​INTP", "​INTP"),
-        ("ENTJ", "ENTJ"),
-        ("ENTP", "ENTP"),
-        ("INFJ", "INFJ"),
-        ("INFP", "INFP"),
-        ("ENFJ", "ENFJ"),
-        ("ENFP", "ENFP"),
-        ("ISTJ", "ISTJ"),
-        ("ISFJ", "ISFJ"),
-        ("ESTJ", "ESTJ"),
-        ("ESFJ", "ESFJ"),
-        ("ISTP", "ISTP"),
-        ("ISFP", "ISFP"),
-        ("ESTP", "ESTP"),
-        ("ESFP", "ESFP"),
+        ("intj", "INTJ"),
+        ("intp", "​INTP"),
+        ("entj", "ENTJ"),
+        ("entp", "ENTP"),
+        ("infj", "INFJ"),
+        ("infp", "INFP"),
+        ("emfj", "ENFJ"),
+        ("enfp", "ENFP"),
+        ("istj", "ISTJ"),
+        ("isfj", "ISFJ"),
+        ("estj", "ESTJ"),
+        ("esfj", "ESFJ"),
+        ("istp", "ISTP"),
+        ("isfp", "ISFP"),
+        ("estp", "ESTP"),
+        ("esfp", "ESFP"),
     )
 
     user = models.OneToOneField(
@@ -59,17 +59,21 @@ class Profile(models.Model):
 
     gender = models.CharField(choices=GENDER_CHOICES, blank=False, max_length=10)
     # avatar = models.ImageField(blank=True)
-    life_pattern = models.CharField(choices=LIFE_CHOICES, blank=True, max_length=10)
+    life_pattern = models.CharField(choices=LIFE_CHOICES, blank=False, max_length=10)
     disposition = models.CharField(
-        choices=DISPOSITION_CHOICE, blank=True, max_length=10
+        choices=DISPOSITION_CHOICE, blank=False, max_length=10
     )
-    mbti = models.CharField(choices=MBTI_CHOICE, blank=True, max_length=5)
+    mbti = models.CharField(choices=MBTI_CHOICE, blank=False, max_length=5)
     message = models.TextField(blank=True, max_length=30)
+
+    def __str__(self):
+        return f"{self.user.username}"
 
 
 class EmailAuth(models.Model):
     signup_email = models.EmailField(null=True)
     code = models.CharField(null=True, max_length=6)
+    using = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.signup_email
+        return f"{self.code} :: {self.usig}"
