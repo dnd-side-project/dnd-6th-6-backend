@@ -20,11 +20,13 @@ from rest_framework import routers
 
 from chores.views import ChoreViewSet, RepeatChoreViewSet
 from feedbacks.views import FeedbackViewSet
+from notices.views import NoticeViewSet
 
 router = routers.DefaultRouter()
 router.register(r'houses/(?P<house_id>\d+)/chores', ChoreViewSet)
 router.register(r'houses/(?P<house_id>\d+)/repeat-chores', RepeatChoreViewSet)
 router.register(r'chores/(?P<chore_id>\d+)/feedbacks', FeedbackViewSet)
+router.register(r'houses/(?P<house_id>\d+)/notices', NoticeViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
