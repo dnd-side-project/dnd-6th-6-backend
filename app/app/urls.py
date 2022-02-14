@@ -19,10 +19,12 @@ from django.urls import include, path
 from rest_framework import routers
 
 from chores.views import ChoreViewSet, RepeatChoreViewSet
+from feedbacks.views import FeedbackViewSet
 
 router = routers.DefaultRouter()
 router.register(r'houses/(?P<house_id>\d+)/chores', ChoreViewSet)
 router.register(r'houses/(?P<house_id>\d+)/repeat-chores', RepeatChoreViewSet)
+router.register(r'chores/(?P<chore_id>\d+)/feedbacks', FeedbackViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
