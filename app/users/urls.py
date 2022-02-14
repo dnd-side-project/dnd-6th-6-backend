@@ -35,6 +35,7 @@ email_list = EmailAuthSet.as_view(
     }
 )
 
+from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [
     path("", user_list),
@@ -45,5 +46,6 @@ urlpatterns = [
     path("profile/", profile),
     path("login/", login),
     path("logout/", logout),
+    # path("login/", obtain_auth_token),
     path("test/", test),  # test
 ]

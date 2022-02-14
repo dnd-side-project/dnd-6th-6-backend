@@ -5,6 +5,7 @@ from rest_framework.decorators import (
     permission_classes,
     authentication_classes,
 )
+from rest_framework.authentication import TokenAuthentication
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.response import Response
 
@@ -82,34 +83,37 @@ def profile(request):
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# {"login_email":"test2@email.com","password":"xptmxmdlqslek"}
+# {"login_email":"test3@email.com","password":"xptmxmdlqslek"}
 # 로그인
 @api_view(["POST"])
 def login(request):
-    if request.method == "POST":
-        login_id = request.data["login_email"]
-        login_pw = request.data["password"]
+    login_id = request.data["login_email"]
+    login_pw = request.data["password"]
 
-        user = authenticate(username=login_id, password=login_pw)
+    user = authenticate(username=login_id, password=login_pw)
 
-        if user is not None:
-            login(request, user=user)
-            # token = Token.objects.get(user=user)
-            return Response(data="로그인 성공", status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+    if user is not None:
+        # login(request, user=user)
+        token = Token.objects.get_or_create(user=user)
+
+        return Response(
+            data={"token": token[0].key},
+            status=status.HTTP_200_OK,
+        )
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 # 로그아웃
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def logout(request):
-    logout(request)
+    request.user.auth_token.delete()
     return Response(data="로그아웃 성공", status=status.HTTP_200_OK)
 
 
-# @authentication_classes([authentication.TokenAuthentication])
-@api_view(["POST"])
+@api_view(["GET"])
+@authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def test(request):
-    return Response({"user": request.user}, status=200)
+    return Response({"user": str(request.user)}, status=200)

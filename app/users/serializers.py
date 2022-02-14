@@ -1,7 +1,12 @@
+import email
 import uuid
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 from .models import EmailAuth, Profile, User
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
 from rest_framework_jwt.settings import api_settings
@@ -78,7 +83,8 @@ class EmailAuthSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         signup_email = validated_data["signup_email"]
         code = self.__send_code(signup_email)
-        emailauth = EmailAuth.objects.create(signup_email=signup_email, code=code)
+        emailauth = EmailAuth(signup_email=signup_email, code=code)
+        emailauth.save()
         return emailauth
 
     # 인증코드 전송
@@ -114,6 +120,6 @@ class CreateUserSerializer(serializers.Serializer):
         user = User(username=signup_email, password=hashed_pw)
         user.save()
 
-        # Token.objects.get_or_create(user=user)  # 토큰 생성
+        Token.objects.get_or_create(user=user)  # 토큰 생성
         Profile.objects.create(user=user)  # 프로필 생성
         return user
