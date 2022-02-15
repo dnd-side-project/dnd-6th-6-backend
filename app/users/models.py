@@ -1,4 +1,4 @@
-from tkinter import CASCADE
+from distutils.command.upload import upload
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -58,7 +58,7 @@ class Profile(models.Model):
     )
 
     gender = models.CharField(choices=GENDER_CHOICES, blank=False, max_length=10)
-    # avatar = models.ImageField(blank=True)
+    avatar = models.ImageField(upload_to="users/images/%Y/%m/%d", blank=True)
     life_pattern = models.CharField(choices=LIFE_CHOICES, blank=False, max_length=10)
     disposition = models.CharField(
         choices=DISPOSITION_CHOICE, blank=False, max_length=10

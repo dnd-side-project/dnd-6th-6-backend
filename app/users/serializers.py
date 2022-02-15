@@ -40,6 +40,7 @@ class SignupProfileSerializer(serializers.ModelSerializer):
 
         profile = Profile.objects.filter(user=user).update(
             gender=validated_data["gender"],
+            avartar=validated_data["avartar"],
             life_pattern=validated_data["life_pattern"],
             disposition=validated_data["disposition"],
             mbti=validated_data["mbti"],
@@ -52,6 +53,7 @@ class SignupProfileSerializer(serializers.ModelSerializer):
         fields = (
             "signup_email",
             "name",
+            "avartar",
             "gender",
             "life_pattern",
             "disposition",

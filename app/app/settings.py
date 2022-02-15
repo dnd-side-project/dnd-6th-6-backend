@@ -50,6 +50,14 @@ MY_APPS = [
     "houses",
     "users",
     "rest_framework.authtoken",
+    # django-allauth
+    "django.contrib.sites",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    # provider
+    "allauth.socialaccount.providers.kakao",
+    "allauth.socialaccount.providers.naver",
 ]
 
 
@@ -138,6 +146,9 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "_media")
+
 #
 # secrets.json
 secret_file = os.path.join(BASE_DIR, "secrets.json")
@@ -166,4 +177,12 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
     ],
+}
+
+SITE_ID = 1
+
+SOCIAL_OUTH_CONFIG = {
+    "KAKAO_REST_API_KEY": get_secret("KAKAO_REST_API_KEY"),
+    "KAKAO_REDIRECT_URI": get_secret("KAKAO_REDIRECT_URI"),
+    "KAKAO_SECRET_KEY": get_secret("KAKAO_SECRET_KEY"),
 }

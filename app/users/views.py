@@ -1,3 +1,4 @@
+from app.settings import SOCIAL_OUTH_CONFIG
 from django.contrib.auth import get_user_model
 from rest_framework import viewsets, status
 from rest_framework.decorators import (
@@ -10,7 +11,7 @@ from django.contrib.auth import authenticate, login, logout
 from rest_framework.response import Response
 
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import (
     UserSerializer,
     ProfileSerializer,
@@ -37,6 +38,7 @@ class EmailAuthSet(viewsets.ModelViewSet):
 
 # 2. 인증코드 인증
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def code(request):  # request code
     code = request.data["code"]
     auth_code = EmailAuth.objects.filter(code=code)
@@ -55,6 +57,7 @@ def code(request):  # request code
 # {"signup_email":"test2@email.com","password":"xptmxmdlqslek","ck_password":"xptmxmdlqslek"}
 # 3. 회원가입
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def password(request):  # request signup_email , password, ck_password
     serializer = CreateUserSerializer(data=request.data)
     pw = request.data["password"]
@@ -72,6 +75,7 @@ def password(request):  # request signup_email , password, ck_password
 
 # 4. 프로필 입력
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def profile(request):
     serializer = SignupProfileSerializer(data=request.data)
 
@@ -86,6 +90,7 @@ def profile(request):
 # {"login_email":"test3@email.com","password":"xptmxmdlqslek"}
 # 로그인
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def login(request):
     login_id = request.data["login_email"]
     login_pw = request.data["password"]
@@ -113,7 +118,29 @@ def logout(request):
 
 
 @api_view(["GET"])
-@authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def test(request):
     return Response({"user": str(request.user)}, status=200)
+
+
+from django.shortcuts import redirect
+import urllib
+
+
+# 코드 요청
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def kakao_login(request):
+    REST_API_KEY = SOCIAL_OUTH_CONFIG["KAKAO_REST_API_KEY"]
+    REDIRECT_URI = SOCIAL_OUTH_CONFIG["KAKAO_REDIRECT_URI"]
+    url = f"https://kauth.kakao.com/oauth/authorize?client_id={REST_API_KEY}&redirect_uri={REDIRECT_URI}&response_type=code"
+
+    return redirect(url)
+
+
+# access token 요청
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def kakao_callback(request):
+    params = urllib.parse.urlencode(request.GET)
+    return redirect(f"http://127.0.0.1:8000/users/login/kakao/callback?{params}")
