@@ -19,7 +19,7 @@ from django.urls import include, path
 from rest_framework import routers
 
 from chores.views import ChoreViewSet, RepeatChoreViewSet
-from comments.views import CommentChoreViewSet
+from comments.views import CommentChoreViewSet, CommentRepeatChoreViewSet
 from feedbacks.views import FeedbackViewSet
 from notices.views import NoticeViewSet
 
@@ -28,6 +28,7 @@ router.register(r'houses/(?P<house_id>\d+)/chores', ChoreViewSet)
 router.register(r'houses/(?P<house_id>\d+)/repeat-chores', RepeatChoreViewSet)
 router.register(r'chores/(?P<chore_id>\d+)/feedbacks', FeedbackViewSet)
 router.register(r'chores/(?P<chore_id>\d+)/comments', CommentChoreViewSet)
+router.register(r'repeat-chores/(?P<repeat_chore_id>\d+)/comments', CommentRepeatChoreViewSet)
 router.register(r'houses/(?P<house_id>\d+)/notices', NoticeViewSet)
 
 urlpatterns = [
