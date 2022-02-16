@@ -19,12 +19,12 @@ class ChoreInfoSerializer(serializers.ModelSerializer):
 
 
 class ChoreSerializer(serializers.ModelSerializer):
-    assignee = UserSerializer(read_only=True)
+    assignees = UserSerializer(read_only=True, many=True)
     information = ChoreInfoSerializer()
 
     class Meta:
         model = Chore
-        fields = ["id", "assignee", "information", "planned_at", "completed_at"]
+        fields = ["id", "assignees", "information", "planned_at", "completed_at"]
 
 
 class DaySerializer(serializers.ModelSerializer):
