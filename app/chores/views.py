@@ -169,7 +169,7 @@ class ChoreViewSet(viewsets.ModelViewSet):
             information__house_id=house_id,
             planned_at__gte=today,
             planned_at__lte=today+datetime.timedelta(days=1)
-        ).exclude(assignee=request.user)
+        ).exclude(assignees=request.user)
 
         page = self.paginate_queryset(queryset_for_house)
         if page is not None:
