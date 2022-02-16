@@ -233,19 +233,33 @@ class RepeatChoreViewSet(viewsets.ModelViewSet):
         return Response(data=serializer_for_chore.data, status=status.HTTP_201_CREATED, headers=headers)
     
     def update(self, request, house_id, *args, **kwargs):
+        try:
+            information = request.data["information"]
+            category = information["category"]
+            category_id = category["id"]
+            days = request.data["days"]
+            days_id = []
+            for i in range(len(days)):
+                days_id.append(days[i]["id"])
+
+            assignees = request.data["assignees"]
+            assignees_id = []
+            for i in range(len(assignees)):
+                assignees_id.append(assignees[i]["id"])
+        except KeyError as e:
+            return Response(e, status=status.HTTP_400_BAD_REQUEST)
+        
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
-        information = request.data.get("information", dict())
         serializer_for_chore_info = ChoreInfoSerializer(
             instance.information,
             data=information,
             partial=partial
         )
         serializer_for_chore_info.is_valid(raise_exception=True)
-        category = information.get("category", {"id": 1})
         chore_info = serializer_for_chore_info.save(
             house_id=house_id,
-            category_id=category["id"]
+            category_id=category_id
         )
 
         serializer_for_chore = self.get_serializer(
@@ -254,12 +268,10 @@ class RepeatChoreViewSet(viewsets.ModelViewSet):
             partial=partial
         )
         serializer_for_chore.is_valid(raise_exception=True)
-        assignees = request.data.get("assignees", instance.assignees)
-        days = request.data.get("days", instance.days)
         serializer_for_chore.save(
-            assignees=assignees,
+            assignees=assignees_id,
             information=chore_info,
-            days=days
+            days=days_id
         )
 
         if getattr(instance, '_prefetched_objects_cache', None):
