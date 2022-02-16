@@ -1,3 +1,5 @@
 from django.contrib import admin
 
-# Register your models here.
+from favor.models import Favor
+
+admin.site.register(Favor)
