@@ -46,7 +46,7 @@ class Chore(models.Model):
     )
 
     def __str__(self):
-        return f"{self.assignee}'s {self.information}"
+        return f"{self.assignees}'s {self.information}"
 
 
 class Day(models.Model):
