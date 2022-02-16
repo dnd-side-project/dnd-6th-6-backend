@@ -11,6 +11,8 @@ from favor.permissions import IsHouseMember
 
 class FavorViewSet(
     mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
     viewsets.GenericViewSet):
 
     queryset = Favor.objects.all()
@@ -36,3 +38,16 @@ class FavorViewSet(
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    
+    def list(self, request, chore_id, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.filter(chore_id=chore_id)
+        
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
