@@ -198,23 +198,35 @@ class RepeatChoreViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
     def create(self, request, house_id, *args, **kwargs):
-        information = request.data.get("information", dict())
-        category = information.get("category", {"id": 1})
+        try:
+            information = request.data["information"]
+            category = information["category"]
+            category_id = category["id"]
+            days = request.data["days"]
+            days_id = []
+            for i in range(len(days)):
+                days_id.append(days[i]["id"])
+
+            assignees = request.data["assignees"]
+            assignees_id = []
+            for i in range(len(assignees)):
+                assignees_id.append(assignees[i]["id"])
+        except KeyError as e:
+            return Response(e, status=status.HTTP_400_BAD_REQUEST)
+        
         serializer_for_chore_info = ChoreInfoSerializer(data=information)
         serializer_for_chore_info.is_valid(raise_exception=True)
         chore_info = serializer_for_chore_info.save(
             house_id=house_id,
-            category_id=category["id"]
+            category_id=category_id
         )
         
-        assignees = request.data.get("assignees", [request.user.id])
-        days = request.data.get("days", [1])
         serializer_for_chore = self.get_serializer(data=request.data)
         serializer_for_chore.is_valid(raise_exception=True)
         serializer_for_chore.save(
-            assignees=assignees,
+            assignees=assignees_id,
             information=chore_info,
-            days=days
+            days=days_id
         )
 
         headers = self.get_success_headers(serializer_for_chore.data)
