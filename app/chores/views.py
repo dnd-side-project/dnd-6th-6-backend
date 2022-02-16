@@ -39,18 +39,45 @@ class ChoreViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset_for_house, many=True)
         return Response(serializer.data)
     
-    def create(self, request, *args, **kwargs):
-        information = request.data.get("information", dict())
+    def create(self, request, house_id, *args, **kwargs):
+        try:
+            information = request.data["information"]
+        except:
+            return Response({"message": "information required"}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer_for_chore_info = ChoreInfoSerializer(data=information)
         serializer_for_chore_info.is_valid(raise_exception=True)
-        category = information.get("category", {"id":1})
-        chore_info = serializer_for_chore_info.save(category_id=category["id"])
+
+        try:
+            category = information["category"]
+            category_id = category["id"]
+        except:
+            return Response({"message": "category required"}, status=status.HTTP_400_BAD_REQUEST)
         
+        chore_info = serializer_for_chore_info.save(
+            house_id=house_id,
+            category_id=category_id
+        )
         serializer_for_chore = self.get_serializer(data=request.data)
         serializer_for_chore.is_valid(raise_exception=True)
-        assignee = request.data.get("assignee", {"id":request.user.id})
+        
+        try:
+            assignees = request.data["assignees"]
+        except:
+            return Response({"message": "assignees required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        assignees_id = []
+        for i in range(len(assignees)):
+            try:
+                assignees_id.append(assignees[i]["id"])
+            except:
+                return Response({"message": "assignees id required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if len(assignees_id) == 0:
+            return Response({"message": "assignees 0"}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer_for_chore.save(
-            assignee_id=assignee["id"],
+            assignees=assignees_id,
             information=chore_info
         )
         
