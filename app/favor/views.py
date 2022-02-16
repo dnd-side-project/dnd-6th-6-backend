@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 
 from rest_framework import mixins, viewsets, status
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -50,4 +51,16 @@ class FavorViewSet(
         
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+    
+    @action(methods=["PATCH"], detail=True)
+    def accept(self, request, chore_id, *args, **kwargs):
+        instance = self.get_object()
+        if instance.to != request.user:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
+        instance.chore.assignees.add(instance.to)
+        instance.chore.assignees.remove(instance._from)
+        instance.save()
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
