@@ -45,7 +45,8 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
-MY_APPS = ["rest_framework", "houses", "users", "chores", "feedbacks", "favor"]
+MY_APPS = ["rest_framework", "houses", "users", "chores", "feedbacks", "favor", "notices", "comments"]
+
 
 INSTALLED_APPS = DJANGO_APPS + MY_APPS
 

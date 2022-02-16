@@ -27,9 +27,8 @@ class ChoreInfo(models.Model):
 
 
 class Chore(models.Model):
-    assignee = models.ForeignKey(
+    assignees = models.ManyToManyField(
         User,
-        on_delete=models.CASCADE,
         related_name="chores",
         related_query_name="has_chore"
     )
