@@ -50,11 +50,6 @@ MY_APPS = [
     "houses",
     "users",
     "rest_framework.authtoken",
-    # django-allauth
-    "django.contrib.sites",
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
     # provider
     "allauth.socialaccount.providers.kakao",
     "allauth.socialaccount.providers.naver",
@@ -165,21 +160,11 @@ def get_secret(setting, secrets=secrets):
         raise ImproperlyConfigured(error_msg)
 
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_HOST_USER = get_secret("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = get_secret("EMAIL_HOST_PASSWORD")
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-DEFAULT_FROM_MAIL = EMAIL_HOST_USER
-
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
     ],
 }
-
-SITE_ID = 1
 
 SOCIAL_OUTH_CONFIG = {
     "KAKAO_REST_API_KEY": get_secret("KAKAO_REST_API_KEY"),
@@ -189,8 +174,3 @@ SOCIAL_OUTH_CONFIG = {
     "NAVER_REDIRECT_URI": get_secret("NAVER_REDIRECT_URI"),
     "NAVER_SECRET_KEY": get_secret("NAVER_SECRET_KEY"),
 }
-
-ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True
-LOGIN_REDIRECT_URL = "/users/profile/"
-ACCOUNT_AUTHENTICATED_LOGOUT_REDIRECTS = True
-ACCOUNT_LOGOUT_REDIRECT_URL = "/"

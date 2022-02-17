@@ -59,15 +59,25 @@ class Profile(models.Model):
 
     gender = models.CharField(choices=GENDER_CHOICES, blank=False, max_length=10)
     avatar = models.ImageField(upload_to="users/images/%Y/%m/%d", blank=True)
-    life_pattern = models.CharField(choices=LIFE_CHOICES, blank=False, max_length=10)
+    life_pattern = models.CharField(choices=LIFE_CHOICES, blank=True, max_length=10)
     disposition = models.CharField(
         choices=DISPOSITION_CHOICE, blank=False, max_length=10
     )
-    mbti = models.CharField(choices=MBTI_CHOICE, blank=False, max_length=5)
+    mbti = models.CharField(choices=MBTI_CHOICE, blank=True, max_length=5)
     message = models.TextField(blank=True, max_length=30)
 
     def __str__(self):
         return f"{self.user}"
+
+
+class SocialUser(models.Model):
+    username = models.EmailField()
+    first_name = models.CharField(max_length=20, null=True)
+    provider = models.CharField(max_length=6)  # kakao/naver
+    profile = models.OneToOneField("Profile", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.username} || {self.provider}"
 
 
 class EmailAuth(models.Model):

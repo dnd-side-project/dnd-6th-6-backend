@@ -2,44 +2,24 @@ import uuid
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.mail import EmailMessage
-from django.contrib.auth import authenticate
-from django.contrib.auth.models import update_last_login
 from rest_framework import serializers
-from rest_framework_jwt.settings import api_settings
 from rest_framework.authtoken.models import Token
-from .models import EmailAuth, Profile, User
-
-
-# jwt 사용
-# JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER
-# JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
-# from rest_framework_simplejwt.tokens import RefreshToken
-
-# get profile
-class ProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Profile
-        exclude = ("user",)
+from .models import EmailAuth, Profile, User, SocialUser
 
 
 # 회원가입시 프로필
 class SignupProfileSerializer(serializers.ModelSerializer):
     signup_email = serializers.CharField(max_length=20)  # 이메일
-    name = serializers.CharField(max_length=20)  # 이름
+    name = serializers.CharField(max_length=10)  # 이름
 
-    def save(self, validated_data):
+    def create(self, validated_data):
         signup_email = validated_data["signup_email"]
 
         user = User.objects.filter(username=signup_email)
         user.update(first_name=validated_data["name"])
 
-        profile = Profile.objects.filter(user=user).update(
+        profile = Profile.objects.filter(user__in=user).update(
             gender=validated_data["gender"],
-            avartar=validated_data["avartar"],
-            life_pattern=validated_data["life_pattern"],
-            disposition=validated_data["disposition"],
-            mbti=validated_data["mbti"],
-            message=validated_data["message"],
         )
         return profile
 
@@ -48,13 +28,15 @@ class SignupProfileSerializer(serializers.ModelSerializer):
         fields = (
             "signup_email",
             "name",
-            "avartar",
             "gender",
-            "life_pattern",
-            "disposition",
-            "mbti",
-            "message",
         )
+
+
+# get user
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        exclude = ("user",)
 
 
 # 전체 유저, 해당 유저
@@ -96,10 +78,10 @@ class EmailAuthSerializer(serializers.ModelSerializer):
         return code
 
 
-# 회원가입
+# 회원가입 - 패스워드
 class CreateUserSerializer(serializers.Serializer):
-    password = serializers.CharField(min_length=8, max_length=12, required=True)
-    ck_password = serializers.CharField(min_length=8, max_length=12, required=True)
+    password = serializers.CharField(max_length=20, required=True)
+    ck_password = serializers.CharField(max_length=20, required=True)
 
     class Meta:
         model = User

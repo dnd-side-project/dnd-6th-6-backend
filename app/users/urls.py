@@ -1,10 +1,9 @@
 from django.urls import path, include
 from users.views import (
     UserViewSet,
-    EmailAuthSet,
-    kakao_callback,
+    auth_email,
+    auth_code,
     password,
-    code,
     login_email,
     login_password,
     logout,
@@ -13,7 +12,7 @@ from users.views import (
     kakao_callback,
     naver_login,
     naver_callback,
-    naver_logout,
+    mypage_profile,
 )
 
 # from rest_framework_simpletwt.views import
@@ -33,22 +32,12 @@ user_detail = UserViewSet.as_view(
     }
 )
 
-# users/email
-email_list = EmailAuthSet.as_view(
-    {
-        "get": "list",
-        "post": "create",
-    }
-)
-
-from rest_framework.authtoken.views import obtain_auth_token
-
 urlpatterns = [
     path("", user_list),
     path("<int:pk>/", user_detail),
-    path("email/", email_list),
+    path("email/", auth_email),
+    path("code/", auth_code),
     path("password/", password),
-    path("code/", code),
     path("profile/", profile),
     path("login/email", login_email),
     path("login/password", login_password),
@@ -57,5 +46,5 @@ urlpatterns = [
     path("login/kakao/callback/", kakao_callback),
     path("login/naver/", naver_login),
     path("login/naver/callback/", naver_callback),
-    path("logout/naver/", naver_logout),
+    path("mypage/profile", mypage_profile),
 ]
