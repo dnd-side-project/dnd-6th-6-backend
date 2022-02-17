@@ -2,14 +2,18 @@ from django.urls import path, include
 from users.views import (
     UserViewSet,
     EmailAuthSet,
+    kakao_callback,
     password,
     code,
-    login,
+    login_email,
+    login_password,
     logout,
     profile,
-    test,
     kakao_login,
     kakao_callback,
+    naver_login,
+    naver_callback,
+    naver_logout,
 )
 
 # from rest_framework_simpletwt.views import
@@ -46,11 +50,12 @@ urlpatterns = [
     path("password/", password),
     path("code/", code),
     path("profile/", profile),
-    path("login/", login),
+    path("login/email", login_email),
+    path("login/password", login_password),
     path("logout/", logout),
     path("login/kakao/", kakao_login),
     path("login/kakao/callback/", kakao_callback),
-    path("accounts/", include("allauth.urls")),
-    # path("login/", obtain_auth_token),
-    path("test/", test),  # test
+    path("login/naver/", naver_login),
+    path("login/naver/callback/", naver_callback),
+    path("logout/naver/", naver_logout),
 ]

@@ -1,18 +1,13 @@
-import email
 import uuid
-from django.contrib.auth.hashers import make_password
-from rest_framework import serializers
-from .models import EmailAuth, Profile, User
-
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.conf import settings
+from django.core.mail import EmailMessage
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
+from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
 from rest_framework.authtoken.models import Token
-from django.contrib.auth.hashers import check_password
-from django.core.mail import EmailMessage
+from .models import EmailAuth, Profile, User
 
 
 # jwt 사용
@@ -103,9 +98,8 @@ class EmailAuthSerializer(serializers.ModelSerializer):
 
 # 회원가입
 class CreateUserSerializer(serializers.Serializer):
-    signup_email = serializers.CharField(max_length=20)
-    password = serializers.CharField(max_length=20)
-    ck_password = serializers.CharField(max_length=20, required=True)
+    password = serializers.CharField(min_length=8, max_length=12, required=True)
+    ck_password = serializers.CharField(min_length=8, max_length=12, required=True)
 
     class Meta:
         model = User
@@ -115,13 +109,16 @@ class CreateUserSerializer(serializers.Serializer):
             "ck_password",
         )
 
-    def create(self, validated_data):
+    def save(self, validated_data):  # 회원가입
         signup_email = validated_data["signup_email"]
-        pw = validated_data["password"]
-        hashed_pw = make_password(pw)
-        user = User(username=signup_email, password=hashed_pw)
+        password = validated_data["password"]
+        user = User(username=signup_email)
+        user.set_password(password)
         user.save()
-
-        Token.objects.get_or_create(user=user)  # 토큰 생성
-        Profile.objects.create(user=user)  # 프로필 생성
         return user
+
+    @receiver(post_save, sender=User)
+    def create_user(sender, instance, created, **kwargs):
+        if created:
+            Token.objects.get_or_create(user=instance)  # 토큰 생성
+            Profile.objects.create(user=instance)  # 프로필 생성
