@@ -28,6 +28,7 @@ class ChoreViewSet(viewsets.ModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         queryset_for_house = queryset.filter(
             information__house_id=house_id,
+            information__repeatchore__isnull=True,
             planned_at__gte=today
         )
 
@@ -49,10 +50,10 @@ class ChoreViewSet(viewsets.ModelViewSet):
             for i in range(len(assignees)):
                 assignees_id.append(assignees[i]["id"])
         except:
-            return Response({"message": "assignees 0"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         
         if not assignees_id:
-            return Response({"message": "assignees 0"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
         serializer_for_chore_info = ChoreInfoSerializer(data=information)
         serializer_for_chore_info.is_valid(raise_exception=True)
