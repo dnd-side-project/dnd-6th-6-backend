@@ -19,6 +19,9 @@ class CommentChore(models.Model):
     content = models.CharField(max_length=255)
     writed_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ["writed_at"]
+
 class CommentRepeatChore(models.Model):
     writer = models.ForeignKey(
         User,
@@ -34,3 +37,6 @@ class CommentRepeatChore(models.Model):
     )
     content = models.CharField(max_length=255)
     writed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["writed_at"]
