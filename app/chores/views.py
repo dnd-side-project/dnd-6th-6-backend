@@ -42,17 +42,20 @@ class ChoreViewSet(viewsets.ModelViewSet):
     def create(self, request, house_id, *args, **kwargs):
         try:
             information = request.data["information"]
+            category = information["category"]
+            category_id = category["id"]
+            assignees = request.data["assignees"]
+            assignees_id = []
+            for i in range(len(assignees)):
+                assignees_id.append(assignees[i]["id"])
         except:
-            return Response({"message": "information required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "assignees 0"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not assignees_id:
+            return Response({"message": "assignees 0"}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer_for_chore_info = ChoreInfoSerializer(data=information)
         serializer_for_chore_info.is_valid(raise_exception=True)
-
-        try:
-            category = information["category"]
-            category_id = category["id"]
-        except:
-            return Response({"message": "category required"}, status=status.HTTP_400_BAD_REQUEST)
         
         chore_info = serializer_for_chore_info.save(
             house_id=house_id,
@@ -60,21 +63,6 @@ class ChoreViewSet(viewsets.ModelViewSet):
         )
         serializer_for_chore = self.get_serializer(data=request.data)
         serializer_for_chore.is_valid(raise_exception=True)
-        
-        try:
-            assignees = request.data["assignees"]
-        except:
-            return Response({"message": "assignees required"}, status=status.HTTP_400_BAD_REQUEST)
-
-        assignees_id = []
-        for i in range(len(assignees)):
-            try:
-                assignees_id.append(assignees[i]["id"])
-            except:
-                return Response({"message": "assignees id required"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        if len(assignees_id) == 0:
-            return Response({"message": "assignees 0"}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer_for_chore.save(
             assignees=assignees_id,
@@ -89,21 +77,24 @@ class ChoreViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         try:
             information = request.data["information"]
+            category = information["category"]
+            category_id = category["id"]
+            assignees = request.data["assignees"]
+            assignees_id = []
+            for i in range(len(assignees)):
+                    assignees_id.append(assignees[i]["id"])
         except:
             return Response({"message": "information required"}, status=status.HTTP_400_BAD_REQUEST)
         
+        if not assignees_id:
+            return Response({"message": "assignees 0"}, status=status.HTTP_400_BAD_REQUEST) 
+               
         serializer_for_chore_info = ChoreInfoSerializer(
             instance.information,
             data=information,
             partial=partial
         )
         serializer_for_chore_info.is_valid(raise_exception=True)
-
-        try:
-            category = information["category"]
-            category_id = category["id"]
-        except:
-            return Response({"message": "category required"}, status=status.HTTP_400_BAD_REQUEST)
         
         chore_info = serializer_for_chore_info.save(
             house_id=house_id,
@@ -115,22 +106,6 @@ class ChoreViewSet(viewsets.ModelViewSet):
             partial=partial
         )
         serializer_for_chore.is_valid(raise_exception=True)
-        
-        
-        try:
-            assignees = request.data["assignees"]
-        except:
-            return Response({"message": "assignees required"}, status=status.HTTP_400_BAD_REQUEST)
-
-        assignees_id = []
-        for i in range(len(assignees)):
-            try:
-                assignees_id.append(assignees[i]["id"])
-            except:
-                return Response({"message": "assignees id required"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        if len(assignees_id) == 0:
-            return Response({"message": "assignees 0"}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer_for_chore.save(
             assignees=assignees_id,
