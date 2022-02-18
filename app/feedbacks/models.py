@@ -22,3 +22,6 @@ class Feedback(models.Model):
 
     def __str__(self):
         return f"{self.chore}: {self.title}"
+    
+    class Meta:
+        ordering = ["-sended_at"]
