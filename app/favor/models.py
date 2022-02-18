@@ -24,3 +24,6 @@ class Favor(models.Model):
     )
     content = models.CharField(max_length=255)
     sended_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-sended_at"]
