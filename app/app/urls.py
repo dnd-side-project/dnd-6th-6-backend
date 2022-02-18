@@ -16,4 +16,26 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
-urlpatterns = [path("admin/", admin.site.urls), path("houses/", include("houses.urls"))]
+from rest_framework import routers
+
+from chores.views import ChoreViewSet, RepeatChoreViewSet
+from comments.views import CommentChoreViewSet, CommentRepeatChoreViewSet
+from favor.views import FavorViewSet
+from feedbacks.views import FeedbackViewSet
+from notices.views import NoticeViewSet
+
+router = routers.DefaultRouter()
+router.register(r'houses/(?P<house_id>\d+)/chores', ChoreViewSet)
+router.register(r'houses/(?P<house_id>\d+)/repeat-chores', RepeatChoreViewSet)
+router.register(r'chores/(?P<chore_id>\d+)/feedbacks', FeedbackViewSet)
+router.register(r'chores/(?P<chore_id>\d+)/comments', CommentChoreViewSet)
+router.register(r'repeat-chores/(?P<repeat_chore_id>\d+)/comments', CommentRepeatChoreViewSet)
+router.register(r'houses/(?P<house_id>\d+)/notices', NoticeViewSet)
+router.register(r'chores/(?P<chore_id>\d+)/favor', FavorViewSet)
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("houses/", include("houses.urls")),
+]
+
+urlpatterns += router.urls

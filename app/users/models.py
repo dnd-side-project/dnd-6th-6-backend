@@ -1,6 +1,9 @@
+from tkinter import CASCADE
 from django.db import models
 from django.contrib.auth.models import User
-# Create your models here.
+
+# Create your models here
+
 
 class Profile(models.Model):
     GENDER_MALE = "M"
@@ -42,9 +45,17 @@ class Profile(models.Model):
         ("ESTP", "ESTP"),
         ("ESFP", "ESFP"),
     )
-    
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    house = models.ForeignKey("houses.House", on_delete=models.SET_NULL, null=True, blank=True)
+
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="user_profile", null=True
+    )
+    house = models.ForeignKey(
+        "houses.House",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="profile",
+    )
 
     gender = models.CharField(choices=GENDER_CHOICES, blank=False, max_length=10)
     # avatar = models.ImageField(blank=True)
@@ -56,5 +67,9 @@ class Profile(models.Model):
     message = models.TextField(blank=True, max_length=30)
 
 
+class EmailAuth(models.Model):
+    signup_email = models.EmailField(null=True)
+    code = models.CharField(null=True, max_length=6)
 
-
+    def __str__(self):
+        return self.signup_email
