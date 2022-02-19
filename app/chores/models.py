@@ -10,8 +10,7 @@ class Category(models.Model):
         return self.name
 
 class ChoreInfo(models.Model):
-    name = models.CharField(max_length=10)
-    description = models.TextField()
+    name = models.CharField(max_length=255)
     house = models.ForeignKey(
         House,
         on_delete=models.CASCADE
