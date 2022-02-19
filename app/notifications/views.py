@@ -1,3 +1,6 @@
+import datetime
+
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -17,30 +20,61 @@ from notifications.serializers import (
 
 @api_view(["GET"])
 def get_notifications(request):
-    notifications_queryset = NotificationNotice.objects.filter(
+    notifications_notice = NotificationNotice.objects.filter(
         to=request.user
     )
-    notifications_queryset.union(
-        NotificationInvite.objects.filter(
-            invite__invitee=request.user
-        ),
-        NotificationFeedback.objects.filter(
-            to=request.user
-        ),
-        NotificationFavor.objects.filter(
-            favor__to=request.user
-        )
-    ).order_by('-created_at')
-
-    notifications = []
-    for notification in notifications_queryset:
-        if type(notification) == NotificationNotice:
-            notifications.append(NotificationNoticeSerializer(notification).data)
-        elif type(notification) == NotificationInvite:
-            notifications.append(NotificationInviteSerializer(notification).data)
-        elif type(notification) == NotificationFeedback:
-            notifications.append(NotificationFeedbackSerializer(notification).data)
-        elif type(notification) == NotificationFavor:
-            notifications.append(NotificationFavorSerializer(notification).data)
+    notifications_invite = NotificationInvite.objects.filter(
+        invite__invitee=request.user
+    )
+    notifications_feedback = NotificationFeedback.objects.filter(
+        to=request.user
+    )
+    notifications_favor = NotificationFavor.objects.filter(
+        favor__to=request.user
+    )
     
+    notifications = []
+    i, j, k, l = 0, 0, 0, 0
+    while i < len(notifications_notice) or j < len(notifications_invite) or k < len(notifications_feedback) or l < len(notifications_favor):
+        latest_time = datetime.datetime(1, 1, 1)
+        if i < len(notifications_notice):
+            notification = notifications_notice[i]
+            created_at = notification.created_at
+            if created_at > latest_time:
+                latest = notification
+                latest_time = created_at
+        if j < len(notifications_invite):
+            notification = notifications_invite[j]
+            created_at = notification.created_at
+            if notification.created_at > latest_time:
+                latest = notification
+                latest_time = created_at
+        if k < len(notifications_feedback):
+            notification = notifications_feedback[k]
+            created_at = notification.created_at
+            if notification.created_at > latest_time:
+                latest = notification
+                latest_time = created_at
+        if l < len(notifications_favor):
+            notification = notifications_favor[l]
+            created_at = notification.created_at
+            if notification.created_at > latest_time:
+                latest = notification
+                latest_time = created_at
+        
+        if type(latest) == NotificationNotice:
+            notifications.append(NotificationNoticeSerializer(latest).data)
+            i += 1
+        elif type(latest) == NotificationInvite:
+            notifications.append(NotificationInviteSerializer(latest).data)
+            j += 1
+        elif type(latest) == NotificationFeedback:
+            notifications.append(NotificationFeedbackSerializer(latest).data)
+            k += 1
+        elif type(latest) == NotificationFavor:
+            notifications.append(NotificationFavorSerializer(latest).data)
+            l += 1
+        else:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
     return Response(notifications)
