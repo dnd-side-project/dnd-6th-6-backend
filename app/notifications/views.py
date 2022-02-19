@@ -1,5 +1,7 @@
 import datetime
 
+from django.shortcuts import get_object_or_404
+
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -78,3 +80,30 @@ def get_notifications(request):
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     return Response(notifications)
+
+@api_view(["PATCH"])
+def check_notification(request, pk):
+    try:
+        _type = request.data["type"]
+    except KeyError:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+    if _type=="notice":
+        notification = get_object_or_404(NotificationNotice, pk=pk, to=request.user)
+        serializer_class = NotificationNoticeSerializer
+    elif _type=="invite":
+        notification = get_object_or_404(NotificationInvite, pk=pk, invite__invitee=request.user)
+        serializer_class = NotificationInviteSerializer
+    elif _type=="feedback":
+        notification = get_object_or_404(NotificationFeedback, pk=pk, to=request.user)
+        serializer_class = NotificationFeedbackSerializer
+    elif _type=="favor":
+        notification = get_object_or_404(NotificationFavor, pk=pk, favor__to=request.user)
+        serializer_class = NotificationFavorSerializer
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+    notification.is_checked = True
+    notification.save()
+    serializer = serializer_class(notification)
+    return Response(serializer.data)
