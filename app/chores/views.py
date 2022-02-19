@@ -49,7 +49,7 @@ class ChoreViewSet(viewsets.ModelViewSet):
             assignees_id = []
             for i in range(len(assignees)):
                 assignees_id.append(assignees[i]["id"])
-        except:
+        except KeyError:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         
         if not assignees_id:
@@ -84,7 +84,7 @@ class ChoreViewSet(viewsets.ModelViewSet):
             assignees_id = []
             for i in range(len(assignees)):
                     assignees_id.append(assignees[i]["id"])
-        except:
+        except KeyError:
             return Response({"message": "information required"}, status=status.HTTP_400_BAD_REQUEST)
         
         if not assignees_id:
@@ -187,8 +187,8 @@ class RepeatChoreViewSet(viewsets.ModelViewSet):
             assignees_id = []
             for i in range(len(assignees)):
                 assignees_id.append(assignees[i]["id"])
-        except KeyError as e:
-            return Response(e, status=status.HTTP_400_BAD_REQUEST)
+        except KeyError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         
         serializer_for_chore_info = ChoreInfoSerializer(data=information)
         serializer_for_chore_info.is_valid(raise_exception=True)
@@ -222,8 +222,8 @@ class RepeatChoreViewSet(viewsets.ModelViewSet):
             assignees_id = []
             for i in range(len(assignees)):
                 assignees_id.append(assignees[i]["id"])
-        except KeyError as e:
-            return Response(e, status=status.HTTP_400_BAD_REQUEST)
+        except KeyError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
