@@ -15,7 +15,7 @@ class ChoreInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ChoreInfo
-        fields = ["id", "name", "description", "house", "category"]
+        fields = ["id", "name", "house", "category"]
 
 
 class ChoreSerializer(serializers.ModelSerializer):
