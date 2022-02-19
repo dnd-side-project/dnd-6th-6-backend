@@ -3,6 +3,7 @@ from django.db import models
 from notices.models import Notice
 from users.models import User
 from houses.models import Invite
+from feedbacks.models import Feedback
 
 class NotificationNotice(models.Model):
     notice = models.ForeignKey(
@@ -33,3 +34,15 @@ class NotificationInvite(models.Model):
 
     class Meta:
         ordering = ["-invite__sended_at"]
+
+class NotificationFeedback(models.Model):
+    feedback = models.ForeignKey(
+        Feedback,
+        on_delete=models.CASCADE,
+        related_name="notifications",
+        related_query_name="notification"
+    )
+    is_checked = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["feedback__sended_at"]
