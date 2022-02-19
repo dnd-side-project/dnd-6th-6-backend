@@ -36,6 +36,7 @@ router.register(r'repeat-chores/(?P<repeat_chore_id>\d+)/comments', CommentRepea
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("houses/", include("houses.urls")),
+    path("notifications/", include("notifications.urls"))
 ]
 
 urlpatterns += router.urls
