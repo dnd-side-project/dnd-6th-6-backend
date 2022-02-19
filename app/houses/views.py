@@ -12,13 +12,13 @@ from houses.serializers import HouseSerializer, InviteSerializer
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_house(request):
-    if request.user.profile.house:
+    if request.user.user_profile.house:
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
     serializer = HouseSerializer(data=request.data)
     if serializer.is_valid():
-        request.user.profile.house = serializer.save()
-        request.user.profile.save()
+        request.user.user_profile.house = serializer.save()
+        request.user.user_profile.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -26,7 +26,7 @@ def create_house(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def invite_member(request):
-    house = request.user.profile.house
+    house = request.user.user_profile.house
     if not house:
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
@@ -41,15 +41,13 @@ def invite_member(request):
     except User.MultipleObjectsReturned:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    serializer = InviteSerializer(
-       data = {
-           "house": house.id,
-           "inviter": request.user.id,
-           "invitee": invitee.id
-       }
-    )
+    serializer = InviteSerializer(data={})
     if serializer.is_valid():
-        serializer.save()
+        serializer.save(
+            house=house,
+            inviter=request.user,
+            invitee=invitee
+        )
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -66,6 +64,6 @@ def accept_invite(request):
     if invite.invitee != request.user:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    request.user.profile.house = invite.house
-    request.user.profile.save()
+    request.user.user_profile.house = invite.house
+    request.user.user_profile.save()
     return Response(status=status.HTTP_200_OK)
