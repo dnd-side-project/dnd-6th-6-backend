@@ -20,3 +20,9 @@ def create_notification_notice(sender, instance, created, **kwargs):
                 continue
             notification = NotificationNotice(notice=instance, to=profile.user)
             notification.save()
+            
+@receiver(post_save, sender=Invite)
+def create_notification_invite(sender, instance, created, **kwargs):
+    if created:
+        notification = NotificationInvite(invite=instance)
+        notification.save()
