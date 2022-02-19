@@ -8,10 +8,11 @@ from favor.models import Favor
 
 class Notification(models.Model):
     is_checked = models.BooleanField(default=False)
-    created_at = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         abstract = True
+        ordering = ["-created_at"]
 
 class NotificationNotice(Notification):
     notice = models.ForeignKey(
