@@ -6,7 +6,14 @@ from houses.models import Invite
 from feedbacks.models import Feedback
 from favor.models import Favor
 
-class NotificationNotice(models.Model):
+class Notification(models.Model):
+    is_checked = models.BooleanField(default=False)
+    created_at = models.DateField(auto_now_add=True)
+
+    class Meta:
+        abstract = True
+
+class NotificationNotice(Notification):
     notice = models.ForeignKey(
         Notice,
         on_delete=models.CASCADE,
@@ -19,43 +26,33 @@ class NotificationNotice(models.Model):
         related_name="notifications_notice",
         related_query_name="notification_notice"
     )
-    is_checked = models.BooleanField(default=False)
 
-    class Meta:
-        ordering = ["-notice__writed_at"]
-
-class NotificationInvite(models.Model):
-    invite = models.ForeignKey(
+class NotificationInvite(Notification):
+    invite = models.OneToOneField(
         Invite,
         on_delete=models.CASCADE,
         related_name="notifications",
         related_query_name="notificatoin"
     )
-    is_checked = models.BooleanField(default=True)
 
-    class Meta:
-        ordering = ["-invite__sended_at"]
-
-class NotificationFeedback(models.Model):
+class NotificationFeedback(Notification):
     feedback = models.ForeignKey(
         Feedback,
         on_delete=models.CASCADE,
         related_name="notifications",
         related_query_name="notification"
     )
-    is_checked = models.BooleanField(default=True)
+    to = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="notifications_feedback",
+        related_query_name="notification_feedback"
+    )
 
-    class Meta:
-        ordering = ["-feedback__sended_at"]
-
-class NotificationFavor(models.Model):
-    favor = models.ForeignKey(
+class NotificationFavor(Notification):
+    favor = models.OneToOneField(
         Favor,
         on_delete=models.CASCADE,
         related_name="notifications",
         related_query_name="notification"
     )
-    is_checked = models.BooleanField(default=False)
-
-    class Meta:
-        ordering = ["-favor__sended_at"]
