@@ -13,25 +13,25 @@ class NotificationNoticeSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = NotificationNotice
-        fields = ["id", "notice", "to", "is_checked"]
+        fields = ["id", "notice", "to", "created_at", "is_checked"]
 
 class NotificationInviteSerializer(serializers.ModelSerializer):
     invite = InviteSerializer(read_only=True)
     
     class Meta:
         model = NotificationInvite
-        fields = ["id", "invite", "is_checked"]
+        fields = ["id", "invite", "created_at", "is_checked"]
 
 class NotificationFeedbackSerializer(serializers.ModelSerializer):
     feedback = FeedbackSerializer(read_only=True)
     
     class Meta:
         model = NotificationFeedback
-        fields = ["id", "feedback", "is_checked"]
+        fields = ["id", "feedback", "created_at", "is_checked"]
 
 class NotificationFavorSerializer(serializers.ModelSerializer):
     favor = FavorSerializer(read_only=True)
     
     class Meta:
         model = NotificationFavor
-        fields = ["id", "favor", "is_checked"]
+        fields = ["id", "favor", "created_at", "is_checked"]
