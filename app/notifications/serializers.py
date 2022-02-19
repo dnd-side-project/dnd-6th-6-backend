@@ -1,10 +1,12 @@
+from dataclasses import field
 from rest_framework import serializers
 
 from users.serializers import UserSerializer
 from notices.serializers import NoticeSerializer
 from houses.serializers import InviteSerializer
 from feedbacks.serializers import FeedbackSerializer
-from notifications.models import NotificationNotice, NotificationInvite, NotificationFeedback
+from favor.serializers import FavorSerializer
+from notifications.models import NotificationNotice, NotificationInvite, NotificationFeedback, NotificationFavor
 
 class NotificationNoticeSerializer(serializers.ModelSerializer):
     notice = NoticeSerializer(read_only=True)
@@ -27,3 +29,10 @@ class NotificationFeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = NotificationFeedback
         fields = ["id", "feedback", "is_checked"]
+
+class NotificatoinFavorSerializer(serializers.ModelSerializer):
+    favor = FavorSerializer(read_only=True)
+    
+    class Meta:
+        model = NotificationFavor
+        fields = ["id", "favor", "is_checked"]
