@@ -31,5 +31,11 @@ def create_notification_invite(sender, instance, created, **kwargs):
 def create_notification_notice(sender, instance, created, **kwargs):
     if created:
         for assignee in instance.chore.assignees.all():
-            notification = NotificationFeedback(Feedback=instance, to=assignee)
+            notification = NotificationFeedback(feedback=instance, to=assignee)
             notification.save()
+
+@receiver(post_save, sender=Favor)
+def create_notification_favor(sender, instance, created, **kwargs):
+    if created:
+        notification = NotificationFavor(favor=instance)
+        notification.save()
