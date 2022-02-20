@@ -45,7 +45,23 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
-MY_APPS = ["rest_framework", "houses", "users", "chores", "feedbacks", "favor", "notices", "comments", "notifications"]
+
+MY_APPS = [
+    "rest_framework",
+    "houses",
+    "users",
+    "chores",
+    "feedbacks",
+    "favor",
+    "notices",
+    "comments",
+    "notifications",
+    # token
+    "rest_framework.authtoken",
+    # provider
+    "allauth.socialaccount.providers.kakao",
+    "allauth.socialaccount.providers.naver",
+]
 
 
 INSTALLED_APPS = DJANGO_APPS + MY_APPS
@@ -133,6 +149,9 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "_media")
+
 #
 # secrets.json
 secret_file = os.path.join(BASE_DIR, "secrets.json")
@@ -149,10 +168,17 @@ def get_secret(setting, secrets=secrets):
         raise ImproperlyConfigured(error_msg)
 
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_HOST_USER = get_secret("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = get_secret("EMAIL_HOST_PASSWORD")
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-DEFAULT_FROM_MAIL = EMAIL_HOST_USER
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+    ],
+}
+
+SOCIAL_OUTH_CONFIG = {
+    "KAKAO_REST_API_KEY": get_secret("KAKAO_REST_API_KEY"),
+    "KAKAO_REDIRECT_URI": get_secret("KAKAO_REDIRECT_URI"),
+    "KAKAO_SECRET_KEY": get_secret("KAKAO_SECRET_KEY"),
+    "NAVER_REST_API_KEY": get_secret("NAVER_REST_API_KEY"),
+    "NAVER_REDIRECT_URI": get_secret("NAVER_REDIRECT_URI"),
+    "NAVER_SECRET_KEY": get_secret("NAVER_SECRET_KEY"),
+}

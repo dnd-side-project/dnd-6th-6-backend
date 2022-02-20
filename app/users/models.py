@@ -1,4 +1,4 @@
-from tkinter import CASCADE
+from distutils.command.upload import upload
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -28,22 +28,22 @@ class Profile(models.Model):
     )
 
     MBTI_CHOICE = (
-        ("INTJ", "INTJ"),
-        ("​INTP", "​INTP"),
-        ("ENTJ", "ENTJ"),
-        ("ENTP", "ENTP"),
-        ("INFJ", "INFJ"),
-        ("INFP", "INFP"),
-        ("ENFJ", "ENFJ"),
-        ("ENFP", "ENFP"),
-        ("ISTJ", "ISTJ"),
-        ("ISFJ", "ISFJ"),
-        ("ESTJ", "ESTJ"),
-        ("ESFJ", "ESFJ"),
-        ("ISTP", "ISTP"),
-        ("ISFP", "ISFP"),
-        ("ESTP", "ESTP"),
-        ("ESFP", "ESFP"),
+        ("intj", "INTJ"),
+        ("intp", "​INTP"),
+        ("entj", "ENTJ"),
+        ("entp", "ENTP"),
+        ("infj", "INFJ"),
+        ("infp", "INFP"),
+        ("emfj", "ENFJ"),
+        ("enfp", "ENFP"),
+        ("istj", "ISTJ"),
+        ("isfj", "ISFJ"),
+        ("estj", "ESTJ"),
+        ("esfj", "ESFJ"),
+        ("istp", "ISTP"),
+        ("isfp", "ISFP"),
+        ("estp", "ESTP"),
+        ("esfp", "ESFP"),
     )
 
     user = models.OneToOneField(
@@ -58,18 +58,32 @@ class Profile(models.Model):
     )
 
     gender = models.CharField(choices=GENDER_CHOICES, blank=False, max_length=10)
-    # avatar = models.ImageField(blank=True)
+    avatar = models.ImageField(upload_to="users/images/%Y/%m/%d", blank=True)
     life_pattern = models.CharField(choices=LIFE_CHOICES, blank=True, max_length=10)
     disposition = models.CharField(
         choices=DISPOSITION_CHOICE, blank=True, max_length=10
     )
     mbti = models.CharField(choices=MBTI_CHOICE, blank=True, max_length=5)
-    message = models.TextField(blank=True, max_length=30)
+    message = models.TextField(max_length=30, blank=True)
+
+    def __str__(self):
+        return f"{self.user}"
+
+
+class SocialUser(models.Model):
+    username = models.EmailField()
+    first_name = models.CharField(max_length=20, null=True)
+    provider = models.CharField(max_length=6)  # kakao/naver
+    profile = models.OneToOneField("Profile", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.username} || {self.provider}"
 
 
 class EmailAuth(models.Model):
     signup_email = models.EmailField(null=True)
     code = models.CharField(null=True, max_length=6)
+    using = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.signup_email
+        return f"{self.code} :: {self.using}"
