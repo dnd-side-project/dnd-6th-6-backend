@@ -45,10 +45,18 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
+
 MY_APPS = [
     "rest_framework",
     "houses",
     "users",
+    "chores",
+    "feedbacks",
+    "favor",
+    "notices",
+    "comments",
+    "notifications",
+    # token
     "rest_framework.authtoken",
     # provider
     "allauth.socialaccount.providers.kakao",

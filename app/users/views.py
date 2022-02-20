@@ -12,7 +12,7 @@ from .serializers import (
     SignupProfileSerializer,
     ProfileSerializer,
 )
-from .models import EmailAuth, Profile, SocialUser
+from .models import EmailAuth, Profile
 
 USERS = get_user_model()
 
@@ -22,6 +22,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
 
+##회원가입##
 # 1. 인증코드 전송 이메일 - 회원 가입, 비밀번호 찾기
 @api_view(["POST"])
 @permission_classes([AllowAny])
@@ -85,7 +86,7 @@ def profile(request):
 
 
 # {"login_email":"test3@email.com","password":"xptmxmdlqslek"}
-# 로그인
+##로그인##
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def login_email(request):
@@ -114,7 +115,7 @@ def login_password(request):  # request login_email, password
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-# 로그아웃
+##로그아웃##
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def logout(request):
@@ -122,11 +123,9 @@ def logout(request):
     return Response(data="로그아웃 성공", status=status.HTTP_200_OK)
 
 
-# 소셜 로그인
+##소셜 로그인##
 from django.shortcuts import redirect
 import requests
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 NAVER_CLIENT_ID = SOCIAL_OUTH_CONFIG["NAVER_REST_API_KEY"]
 NAVER_CALLBACK_URL = SOCIAL_OUTH_CONFIG["NAVER_REDIRECT_URI"]
@@ -140,7 +139,7 @@ KAKAO_REDIRECT_URI = SOCIAL_OUTH_CONFIG["KAKAO_REDIRECT_URI"]
 @permission_classes([AllowAny])
 def naver_login(request):
     ##Code Request##
-    url = f"https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id={NAVER_CLIENT_ID}&redirect_uri={NAVER_CALLBACK_URL}"
+    url = f"https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id={NAVER_CLIENT_ID}&&state=STATE_STRING&redirect_uri={NAVER_CALLBACK_URL}"
     return redirect(url)
 
 
@@ -148,6 +147,9 @@ def naver_login(request):
 @permission_classes([AllowAny])
 def naver_callback(request):
     ##Access Token Request##
+    if "error" in request.query_params:
+        return Response(data="에러 발생", status=status.HTTP_400_BAD_REQUEST)
+
     code = request.query_params["code"]
     url = f"https://nid.naver.com/oauth2.0/token?grant_type=authorization_code&client_id={NAVER_CLIENT_ID}&client_secret={NAVER_CLIENT_SECRET}&code={code}"
     code_response = requests.post(url)
@@ -163,8 +165,9 @@ def naver_callback(request):
     profile = response.json().get("response")
 
     name = profile.get("name")  # 이름
-    gender = profile.get("gender")  # F/M/ U(확인불가)
+    gender = profile.get("gender")  # F/M
     email = profile.get("email")  # email
+    avartar = profile.get("profile_image")  # link
 
     try:  # 로그인
         user = USERS.objects.get(username=email)
@@ -177,19 +180,12 @@ def naver_callback(request):
 
     except USERS.DoesNotExist:  # 회원가입
         user = USERS.objects.create_user(username=email, first_name=name)
-        Profile.objects.filter(user=user).update(gender=gender)
+        Profile.objects.filter(user=user).update(gender=gender, avartar=avartar)
 
         return Response(
             data={"token": token[0].key},
             status=status.HTTP_200_OK,
         )
-
-
-@receiver(post_save, sender=SocialUser)
-def create_social_user(sender, instance, created, **kwargs):
-    if created:
-        Token.objects.get_or_create(user=instance)  # 토큰 생성
-        Profile.objects.create()  # 프로필 생성
 
 
 @api_view(["GET"])
@@ -247,19 +243,27 @@ def kakao_callback(request):
         )
 
 
-# 마이페이지 - 프로필
-@api_view(["GET", "POST"])
+##마이페이지 - 프로필##
+@api_view(["GET", "PATCH"])
 @permission_classes([IsAuthenticated])
 def mypage_profile(request):
-    if request.method == "GET":
+    if request.method == "GET":  # 조회
         profile = request.user.user_profile
         serializer = ProfileSerializer(profile)
-        return Response(serializer.data)
+        token = "6862bc494c776a6751a523a1f521420e25fcad3a"
+        headers = f"Authorization: Token  {token}"
+        return Response(serializer.data, headers=headers)
 
-    elif request.method == "POST":
-        serializer = ProfileSerializer(request.data)
+    elif request.method == "PATCH":  # 수정
+        serializer = ProfileSerializer(profile, request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(status=status.HTTP_200_OK)  # 성공
+            return Response(data=serializer.data, status=status.HTTP_200_OK)  # 성공
     else:
         return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# test
+class TestViewSet(viewsets.ModelViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer

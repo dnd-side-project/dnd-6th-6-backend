@@ -32,3 +32,6 @@ class Invite(models.Model):
 
     def __str__(self):
         return f"{self.inviter} invited {self.invitee} to {self.house}"
+    
+    class Meta:
+        ordering = ["-sended_at"]

@@ -1,5 +1,6 @@
 from django.urls import path, include
 from users.views import (
+    TestViewSet,
     UserViewSet,
     auth_email,
     auth_code,
@@ -15,7 +16,6 @@ from users.views import (
     mypage_profile,
 )
 
-# from rest_framework_simpletwt.views import
 # users/
 user_list = UserViewSet.as_view(
     {
@@ -26,6 +26,19 @@ user_list = UserViewSet.as_view(
 
 # users/{user-id}
 user_detail = UserViewSet.as_view(
+    {
+        "get": "retrieve",  # 해당 유저 조회
+        "put": "update",  # 수정
+    }
+)
+test_list = UserViewSet.as_view(
+    {
+        "get": "list",  # 유저 목록
+        "post": "create",  # 회원가입
+    }
+)
+
+test_detail = TestViewSet.as_view(
     {
         "get": "retrieve",  # 해당 유저 조회
         "put": "update",  # 수정
@@ -47,4 +60,6 @@ urlpatterns = [
     path("login/naver/", naver_login),
     path("login/naver/callback/", naver_callback),
     path("mypage/profile", mypage_profile),
+    path("test/", test_list),  # test
+    path("test/<int:pk>", test_detail),  # test
 ]

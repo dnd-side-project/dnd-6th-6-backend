@@ -61,10 +61,10 @@ class Profile(models.Model):
     avatar = models.ImageField(upload_to="users/images/%Y/%m/%d", blank=True)
     life_pattern = models.CharField(choices=LIFE_CHOICES, blank=True, max_length=10)
     disposition = models.CharField(
-        choices=DISPOSITION_CHOICE, blank=False, max_length=10
+        choices=DISPOSITION_CHOICE, blank=True, max_length=10
     )
     mbti = models.CharField(choices=MBTI_CHOICE, blank=True, max_length=5)
-    message = models.TextField(blank=True, max_length=30)
+    message = models.TextField(max_length=30, blank=True)
 
     def __str__(self):
         return f"{self.user}"

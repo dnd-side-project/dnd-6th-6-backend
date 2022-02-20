@@ -7,7 +7,7 @@ from rest_framework.authtoken.models import Token
 from .models import EmailAuth, Profile, User, SocialUser
 
 
-# 회원가입시 프로필
+##회원가입-프로필##
 class SignupProfileSerializer(serializers.ModelSerializer):
     signup_email = serializers.CharField(max_length=20)  # 이메일
     name = serializers.CharField(max_length=10)  # 이름
@@ -39,7 +39,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         exclude = ("user",)
 
 
-# 전체 유저, 해당 유저
+##전체 유저, 해당 유저 조회 ##
 class UserSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(source="user_profile", read_only=True)
 
@@ -53,7 +53,7 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 
-# 이메일 인증
+##회원가입-이메일 인증##
 class EmailAuthSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmailAuth
@@ -78,7 +78,7 @@ class EmailAuthSerializer(serializers.ModelSerializer):
         return code
 
 
-# 회원가입 - 패스워드
+##회원가입-패스워드##
 class CreateUserSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=20, required=True)
     ck_password = serializers.CharField(max_length=20, required=True)
