@@ -47,19 +47,17 @@ test_detail = TestViewSet.as_view(
 
 urlpatterns = [
     path("", user_list),
-    path("<int:pk>/", user_detail),
-    path("email/", auth_email),
-    path("code/", auth_code),
-    path("password/", password),
-    path("profile/", profile),
+    path("<int:pk>", user_detail),
+    path("email", auth_email),
+    path("code", auth_code),
+    path("password", password),
+    path("profile", profile),
     path("login/email", login_email),
     path("login/password", login_password),
-    path("logout/", logout),
-    path("login/kakao/", kakao_login),
-    path("login/kakao/callback/", kakao_callback),
-    path("login/naver/", naver_login),
-    path("login/naver/callback/", naver_callback),
+    path("logout", logout),
+    path("login/kakao", kakao_login),
+    path("login/kakao/callback", kakao_callback),
+    path("login/naver", naver_login),
+    path("login/naver/callback", naver_callback),
     path("mypage/profile", mypage_profile),
-    path("test/", test_list),  # test
-    path("test/<int:pk>", test_detail),  # test
 ]
