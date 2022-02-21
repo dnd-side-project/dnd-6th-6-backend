@@ -22,17 +22,6 @@ class Profile(models.Model):
         return f"{self.user}"
 
 
-# test
-class SocialUser(models.Model):
-    username = models.EmailField()
-    first_name = models.CharField(max_length=20, null=True)
-    provider = models.CharField(max_length=6)  # kakao/naver
-    profile = models.OneToOneField("Profile", on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"{self.username} || {self.provider}"
-
-
 class EmailAuth(models.Model):
     signup_email = models.EmailField(null=True)
     code = models.CharField(null=True, max_length=6)

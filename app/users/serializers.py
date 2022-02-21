@@ -5,7 +5,7 @@ from django.core.mail import EmailMessage
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import ValidationError
-from .models import EmailAuth, Profile, User, SocialUser
+from .models import EmailAuth, Profile, User
 
 
 ##회원가입-프로필##
