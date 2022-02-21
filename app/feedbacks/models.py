@@ -16,12 +16,8 @@ class Feedback(models.Model):
         related_name="feedback",
         related_query_name="has_feedback"
     )
-    title = models.CharField(max_length=255)
     content = models.CharField(max_length=255)
     sended_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.chore}: {self.title}"
     
     class Meta:
         ordering = ["-sended_at"]
