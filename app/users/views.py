@@ -1,7 +1,12 @@
+from logging import raiseExceptions
 from app.settings import SOCIAL_OUTH_CONFIG
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import viewsets, status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import (
+    api_view,
+    permission_classes,
+    authentication_classes,
+)
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -25,9 +30,17 @@ class UserViewSet(viewsets.ModelViewSet):
 ##회원가입##
 # 1. 인증코드 전송 이메일 - 회원 가입, 비밀번호 찾기
 @api_view(["POST"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def auth_email(request):  # signtup_email
     serializer = EmailAuthSerializer(data=request.data)
+    user = USERS.objects.filter(username=request.data["signup_email"])
+
+    if user.count() == 1:
+        return Response(
+            data={"error": "이미 존재하는 이메일입니다."}, status=status.HTTP_400_BAD_REQUEST
+        )
+
     if serializer.is_valid():
         serializer.save()
         return Response(status=status.HTTP_200_OK)  # 전송
@@ -37,12 +50,18 @@ def auth_email(request):  # signtup_email
 
 # 2. 인증코드 인증
 @api_view(["POST"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def auth_code(request):  # request code
     code = request.data["code"]
     auth_code = EmailAuth.objects.filter(code=code)
 
-    if (auth_code is not None) and (auth_code.using):
+    if code.__eq__(""):
+        return Response(
+            data={"error": "인증코드를 입력해주세요"}, status=status.HTTP_400_BAD_REQUEST
+        )  # 실패
+
+    if (auth_code.count() == 1) and (auth_code.using):
         auth_code.update(using=False)
 
         return Response(
@@ -50,34 +69,33 @@ def auth_code(request):  # request code
             status=status.HTTP_200_OK,
         )  # 인증성공
     else:
-        return Response(status=status.HTTP_400_BAD_REQUEST)  # 실패
+        return Response(
+            data={"error": "인증코드를 다시 확인해주세요"}, status=status.HTTP_400_BAD_REQUEST
+        )  # 실패
 
 
 # {"signup_email":"test2@email.com","password":"xptmxmdlqslek","ck_password":"xptmxmdlqslek"}
 # 3. 패스워드 입력 - 회원가입, 비밀번호 찾기
 @api_view(["POST"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def password(request):  # request signup_email , password, ck_password
     serializer = CreateUserSerializer(data=request.data)
-    pw = request.data["password"]
-    ck_pw = request.data["ck_password"]
 
-    if pw == ck_pw:
-        if serializer.is_valid(raise_exception=True):
-            serializer.save(request.data)
-            return Response(status=status.HTTP_200_OK)  # 성공
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+    if serializer.is_valid(raise_exception=True):
+        serializer.save(request.data)
+        return Response(status=status.HTTP_200_OK)  # 성공
     else:
-        return Response(data="비밀번호가 불일치합니다.", status=status.HTTP_400_BAD_REQUEST)  # 실패
+        return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# 4. 프로필 입력
+# 4. 프로필 입력 - 이름
 @api_view(["POST"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def profile(request):
     serializer = SignupProfileSerializer(data=request.data)
-    # request signup_email, name, gender
+    # request signup_email, name
     if serializer.is_valid():
         serializer.save()
         return Response(status=status.HTTP_200_OK)  # 성공
@@ -88,31 +106,50 @@ def profile(request):
 # {"login_email":"test3@email.com","password":"xptmxmdlqslek"}
 ##로그인##
 @api_view(["POST"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def login_email(request):
     login_email = request.data["login_email"]
-    return Response(data={"login_email": login_email}, status=status.HTTP_200_OK)
+    user = USERS.objects.filter(username=login_email)
+
+    if login_email.__eq__(""):
+        return Response(
+            data={"error": "로그인 할 이메일을 입력해주세요."}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if user.count() == 1:
+        return Response(
+            data={"login_email": login_email},
+            status=status.HTTP_200_OK,
+        )
+    else:
+        return Response(
+            data={"error": "존재하지 않은 이메일입니다."}, status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 @api_view(["POST"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def login_password(request):  # request login_email, password
     login_email = request.data["login_email"]
     login_password = request.data["password"]
 
-    user = authenticate(username=login_email, password=login_password)
-
-    if user is not None:
-        # login(request, user=user)
-        token = Token.objects.get_or_create(user=user)
-        to = f"Authorization: Token  {token[0].key}"
-        headers = {"Authorization": to}
-
+    if login_password.__eq__(""):  # 비밀번호 빈칸
         return Response(
-            data={"token": token[0].key}, status=status.HTTP_200_OK, headers=headers
+            data={"error": "비밀번호를 입력해주세요."}, status=status.HTTP_400_BAD_REQUEST
         )
+
     else:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        user = authenticate(username=login_email, password=login_password)
+
+        if user is not None:
+            token = Token.objects.get_or_create(user=user)
+            return Response(data={"token": token[0].key}, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                data={"error": "비밀번호를 확인해주세요"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 ##로그아웃##
@@ -136,6 +173,7 @@ KAKAO_REDIRECT_URI = SOCIAL_OUTH_CONFIG["KAKAO_REDIRECT_URI"]
 
 
 @api_view(["GET"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def naver_login(request):
     ##Code Request##
@@ -165,7 +203,6 @@ def naver_callback(request):
     profile = response.json().get("response")
 
     name = profile.get("name")  # 이름
-    gender = profile.get("gender")  # F/M
     email = profile.get("email")  # email
     avartar = profile.get("profile_image")  # link
 
@@ -180,7 +217,7 @@ def naver_callback(request):
 
     except USERS.DoesNotExist:  # 회원가입
         user = USERS.objects.create_user(username=email, first_name=name)
-        Profile.objects.filter(user=user).update(gender=gender, avartar=avartar)
+        # Profile.objects.filter(user=user).update(gender=gender, avartar=avartar)
 
         return Response(
             data={"token": token[0].key},
@@ -219,8 +256,6 @@ def kakao_callback(request):
 
     if profile["has_email"]:  # true
         email = profile["email"]
-    if profile["has_gender"]:
-        gender = profile["gender"]  # female, male
 
     name = profile["profile"]["nickname"]
 
@@ -235,7 +270,7 @@ def kakao_callback(request):
 
     except USERS.DoesNotExist:  # 회원가입
         user = USERS.objects.create_user(username=email, first_name=name)
-        Profile.objects.filter(user=user).update(gender=gender)
+        # Profile.objects.filter(user=user).update(gender=gender)
 
         return Response(
             data={"token": token[0].key},
@@ -250,9 +285,7 @@ def mypage_profile(request):
     if request.method == "GET":  # 조회
         profile = request.user.user_profile
         serializer = ProfileSerializer(profile)
-        token = "6862bc494c776a6751a523a1f521420e25fcad3a"
-        headers = f"Authorization: Token  {token}"
-        return Response(serializer.data, headers=headers)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
     elif request.method == "PATCH":  # 수정
         serializer = ProfileSerializer(profile, request.data)
