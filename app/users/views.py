@@ -283,8 +283,8 @@ def kakao_callback(request):
 @permission_classes([IsAuthenticated])
 def mypage_profile(request):
     if request.method == "GET":  # 조회
-        profile = request.user.user_profile
-        serializer = ProfileSerializer(profile)
+        profile = request.user
+        serializer = UserSerializer(profile)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
     elif request.method == "PATCH":  # 수정

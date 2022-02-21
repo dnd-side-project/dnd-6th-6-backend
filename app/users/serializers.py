@@ -1,12 +1,11 @@
 import uuid, re
-from wsgiref import validate
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.mail import EmailMessage
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
-from .models import EmailAuth, Profile, User, SocialUser
 from rest_framework.exceptions import ValidationError
+from .models import EmailAuth, Profile, User, SocialUser
 
 
 ##회원가입-프로필##
@@ -31,6 +30,8 @@ class SignupProfileSerializer(serializers.ModelSerializer):
 
 # get user
 class ProfileSerializer(serializers.ModelSerializer):
+    house = serializers.StringRelatedField(read_only=True)
+
     class Meta:
         model = Profile
         fields = (

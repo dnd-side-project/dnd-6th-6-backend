@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 
 class Profile(models.Model):
     user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="user_profile", null=True
+        User, on_delete=models.CASCADE, related_name="user_profile", null=False
     )
     house = models.ForeignKey(
         "houses.House",
