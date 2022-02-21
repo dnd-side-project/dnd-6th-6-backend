@@ -210,7 +210,7 @@ def naver_callback(request):
     email = profile.get("email")  # email
 
     avatar_url = profile.get("profile_image")  # url
-    avatar = urlparse(avatar_url).path.split("/")[-1]
+    avatar = urlparse(avatar_url).path.split("/")[-1]  # url에서 이미지 추출
     avatar_response = requests.get(avatar_url)
 
     # return Response(data={"name": name, "email": email, "avatar": avatar})
@@ -229,7 +229,9 @@ def naver_callback(request):
         token = Token.objects.get_or_create(user=user)
 
         profile = Profile.objects.get(user=user)
-        profile.avatar.save(avatar, ContentFile(avatar_response.content), save=True)
+        profile.avatar.save(
+            avatar, ContentFile(avatar_response.content), save=True
+        )  # Bytes
 
         return Response(
             data={"token": token[0].key},
@@ -257,7 +259,7 @@ def kakao_callback(request):
     profileUrl = "https://kapi.kakao.com/v2/user/me"  # 유저 정보 조회하는 uri
     auth = "Bearer " + tokenJson["access_token"]
 
-    return Response(data=tokenJson["access_token"])
+    # return Response(data=tokenJson["access_token"])
     headers = {
         "Authorization": auth,
         "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
@@ -269,21 +271,14 @@ def kakao_callback(request):
     kakao_account = profile_json.get("kakao_account")
 
     if kakao_account["has_email"]:  # true
-        email = kakao_account["email"]
-    else:
         return Response(data={"error": "서비스를 이용하기 위해서는 이메일 동의가 필요합니다."})
 
+    email = kakao_account["email"]
     name = kakao_account["profile"]["nickname"]
-    # avatar = kakao_account["profile_image"]
 
-    return Response(
-        data={
-            "email": email,
-            "name": name,
-            # "ava": avatar,
-        },
-        status=200,
-    )
+    avatar_url = kakao_account["profile"]["profile_image_url"]  # url
+    avatar = urlparse(avatar_url).path.split("/")[-1]  # url에서 이미지 추출
+    avatar_response = requests.get(avatar_url)
 
     try:  # 로그인
         user = USERS.objects.get(username=email)
@@ -296,8 +291,12 @@ def kakao_callback(request):
 
     except USERS.DoesNotExist:  # 회원가입
         user = USERS.objects.create_user(username=email, first_name=name)
-        token = Token.objects.create(user=user)
-        # Profile.objects.filter(user=user).update(gender=gender)
+        token = Token.objects.get_or_create(user=user)
+
+        profile = Profile.objects.get(user=user)
+        profile.avatar.save(
+            avatar, ContentFile(avatar_response.content), save=True
+        )  # Bytes
 
         return Response(
             data={"token": token[0].key},
@@ -305,10 +304,10 @@ def kakao_callback(request):
         )
 
 
-@api_view(["POST"])
+@api_view(["GET"])
 def kakao_logout(request):
     url = "http://kapi.kakao.com/v1/user/logout"
-    access_token = "JPOVkcdYzNrc6e72AUymJVWYEBYQtBURmuG0Bgo9cpgAAAF_HEtatg"
+    access_token = "fRSp1fv-8bJlTJ_zf_qAwvWGXvc3FrPjri7DpQopcSEAAAF_HJwmIw"
     auth = "Bearer " + access_token
     headers = {
         "Authorization": auth,
