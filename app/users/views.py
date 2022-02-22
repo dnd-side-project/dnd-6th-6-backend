@@ -1,4 +1,3 @@
-from logging import raiseExceptions
 from app.settings import SOCIAL_OUTH_CONFIG
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import viewsets, status
@@ -74,7 +73,6 @@ def auth_code(request):  # request code
         )  # 실패
 
 
-# {"signup_email":"test2@email.com","password":"xptmxmdlqslek","ck_password":"xptmxmdlqslek"}
 # 3. 패스워드 입력 - 회원가입, 비밀번호 찾기
 @api_view(["POST"])
 @authentication_classes([])
@@ -103,7 +101,6 @@ def profile(request):
         return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# {"login_email":"test3@email.com","password":"xptmxmdlqslek"}
 ##로그인##
 @api_view(["POST"])
 @authentication_classes([])
@@ -312,6 +309,7 @@ def kakao_callback(request):
         )
 
 
+# test
 @api_view(["GET"])
 def kakao_logout(request):
     url = "http://kapi.kakao.com/v1/user/logout"
@@ -340,9 +338,3 @@ def mypage_profile(request):
             return Response(data=serializer.data, status=status.HTTP_200_OK)  # 성공
     else:
         return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# test
-class TestViewSet(viewsets.ModelViewSet):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
