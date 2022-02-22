@@ -7,6 +7,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import ValidationError
 from .models import EmailAuth, Profile, User
 
+# from houses.serializers import HouseSerializer
+
 
 ##회원가입-프로필##
 class SignupProfileSerializer(serializers.ModelSerializer):
@@ -34,15 +36,12 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = (
-            "avatar",
-            "house",
-        )
+        fields = ("avatar", "house")
 
 
 ##전체 유저, 해당 유저 조회 ##
 class UserSerializer(serializers.ModelSerializer):
-    profile = ProfileSerializer(source="user_profile", read_only=True)
+    user_profile = ProfileSerializer(read_only=True)
 
     class Meta:
         model = User
@@ -50,7 +49,7 @@ class UserSerializer(serializers.ModelSerializer):
             "id",
             "username",  # 회원가입한 이메일
             "first_name",  # 유저이름
-            "profile",
+            "user_profile",
         )
 
 
