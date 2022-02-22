@@ -142,10 +142,14 @@ def login_password(request):  # request login_email, password
 
     else:
         user = authenticate(username=login_email, password=login_password)
+        user_ser = UserSerializer(user)
 
         if user is not None:
             token = Token.objects.get_or_create(user=user)
-            return Response(data={"token": token[0].key}, status=status.HTTP_200_OK)
+            return Response(
+                data={"token": token[0].key, "user": user_ser.data},
+                status=status.HTTP_200_OK,
+            )
         else:
             return Response(
                 data={"error": "비밀번호를 확인해주세요"}, status=status.HTTP_400_BAD_REQUEST
@@ -217,15 +221,17 @@ def naver_callback(request):
 
     try:  # 로그인
         user = USERS.objects.get(username=email)
+        user_ser = UserSerializer(user)
         token = Token.objects.get_or_create(user=user)
 
         return Response(
-            data={"token": token[0].key},
+            data={"token": token[0].key, "user": user_ser.data},
             status=status.HTTP_200_OK,
         )
 
     except USERS.DoesNotExist:  # 회원가입
         user = USERS.objects.create_user(username=email, first_name=name)
+        user_ser = UserSerializer(user)
         token = Token.objects.get_or_create(user=user)
 
         profile = Profile.objects.get(user=user)
@@ -234,7 +240,7 @@ def naver_callback(request):
         )  # Bytes
 
         return Response(
-            data={"token": token[0].key},
+            data={"token": token[0].key, "user": user_ser.data},
             status=status.HTTP_200_OK,
         )
 
@@ -282,15 +288,17 @@ def kakao_callback(request):
 
     try:  # 로그인
         user = USERS.objects.get(username=email)
+        user_ser = UserSerializer(user)
         token = Token.objects.get_or_create(user=user)
 
         return Response(
-            data={"token": token[0].key},
+            data={"token": token[0].key, "user": user_ser.data},
             status=status.HTTP_200_OK,
         )
 
     except USERS.DoesNotExist:  # 회원가입
         user = USERS.objects.create_user(username=email, first_name=name)
+        user_ser = UserSerializer(user)
         token = Token.objects.get_or_create(user=user)
 
         profile = Profile.objects.get(user=user)
@@ -299,7 +307,7 @@ def kakao_callback(request):
         )  # Bytes
 
         return Response(
-            data={"token": token[0].key},
+            data={"token": token[0].key, "user": user_ser.data},
             status=status.HTTP_200_OK,
         )
 
