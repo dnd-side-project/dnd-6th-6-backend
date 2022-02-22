@@ -14,7 +14,6 @@ class Profile(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="profile",
     )
     avatar = models.ImageField(upload_to="users/images/%Y/%m/%d", blank=True)
 

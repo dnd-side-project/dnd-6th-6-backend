@@ -159,8 +159,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "_media")
 # CORS
 CORS_ORIGIN_WHITELIST = [
     # 허용 호스트
-    "http://127.0.0.1:8000",
-    "http://localhost:8000",
+    "http://127.0.0.1:3000",
+    "http://localhost:3000",
 ]
 
 CORS_ALLOW_CREDENTIALS = True  # True일 경우 모든 도메인 허용, whitelist 사용X
