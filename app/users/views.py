@@ -270,7 +270,7 @@ def kakao_callback(request):
     profile_json = response.json()
     kakao_account = profile_json.get("kakao_account")
 
-    if kakao_account["has_email"]:  # true
+    if not kakao_account["has_email"]:  # false
         return Response(data={"error": "서비스를 이용하기 위해서는 이메일 동의가 필요합니다."})
 
     email = kakao_account["email"]
