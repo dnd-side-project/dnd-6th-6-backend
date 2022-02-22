@@ -1,12 +1,11 @@
 import uuid, re
-from wsgiref import validate
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.mail import EmailMessage
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
-from .models import EmailAuth, Profile, User, SocialUser
 from rest_framework.exceptions import ValidationError
+from .models import EmailAuth, Profile, User
 
 
 ##회원가입-프로필##
@@ -31,6 +30,8 @@ class SignupProfileSerializer(serializers.ModelSerializer):
 
 # get user
 class ProfileSerializer(serializers.ModelSerializer):
+    house = serializers.StringRelatedField(read_only=True)
+
     class Meta:
         model = Profile
         fields = (
@@ -99,10 +100,10 @@ class CreateUserSerializer(serializers.Serializer):
             raise ValidationError("비밀번호가 일치하지 않습니다.")
         elif len(pw) < 8 or len(pw) > 20:
             raise ValidationError("비밀번호는 8자리 이상 20자리 이하로 설정해주십시오.")
-        elif not (
-            re.findall("[0-9]", pw)
-            and (re.findall("[a-z]", pw) or re.findall("[A-Z]", pw))
-            and re.findall("[`~!@#$%^&*()_=-+[]?/<>,.]", pw)
+        elif (
+            not re.findall("[0-9]+", pw)
+            or not (re.findall("[a-z]+", pw) or re.findall("[A-Z]+", pw))
+            or re.search("[`~!@#$%^&*(),<.>/?]+", pw) is None
         ):
             raise ValidationError("최소 1개 이상의 숫자, 영문자, 특수 문자를 포함해 주십시오")
         else:

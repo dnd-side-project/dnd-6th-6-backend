@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 
 class Profile(models.Model):
     user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="user_profile", null=True
+        User, on_delete=models.CASCADE, related_name="user_profile", null=False
     )
     house = models.ForeignKey(
         "houses.House",
@@ -20,17 +20,6 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"{self.user}"
-
-
-# test
-class SocialUser(models.Model):
-    username = models.EmailField()
-    first_name = models.CharField(max_length=20, null=True)
-    provider = models.CharField(max_length=6)  # kakao/naver
-    profile = models.OneToOneField("Profile", on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"{self.username} || {self.provider}"
 
 
 class EmailAuth(models.Model):

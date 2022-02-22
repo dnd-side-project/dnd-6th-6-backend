@@ -47,6 +47,9 @@ DJANGO_APPS = [
 
 
 MY_APPS = [
+    # cors
+    "corsheaders",
+    # app
     "rest_framework",
     "houses",
     "users",
@@ -67,6 +70,7 @@ MY_APPS = [
 INSTALLED_APPS = DJANGO_APPS + MY_APPS
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",  # cors
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -151,6 +155,16 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "_media")
+
+# CORS
+CORS_ORIGIN_WHITELIST = [
+    # 허용 호스트
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+]
+
+CORS_ALLOW_CREDENTIALS = True  # True일 경우 모든 도메인 허용, whitelist 사용X
+
 
 #
 # secrets.json
