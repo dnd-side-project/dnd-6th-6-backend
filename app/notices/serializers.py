@@ -7,4 +7,4 @@ class NoticeSerializer(serializers.ModelSerializer):
     writer = UserSerializer(read_only=True)
     class Meta:
         model = Notice
-        fields = ["id", "writer", "title", "content", "writed_at", "updated_at"]
+        fields = ["id", "writer", "content", "writed_at", "updated_at"]
