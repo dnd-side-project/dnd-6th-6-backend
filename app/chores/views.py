@@ -2,13 +2,13 @@ import datetime
 from django.utils import timezone
 
 from rest_framework import status, viewsets
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from chores.models import Chore, RepeatChore
+from chores.models import Chore, RepeatChore, Category
 from chores.permissions import IsHouseMember
-from chores.serializers import ChoreSerializer, ChoreInfoSerializer, RepeatChoreSerializer
+from chores.serializers import ChoreSerializer, ChoreInfoSerializer, RepeatChoreSerializer, CategorySerializer
 
 def get_today():
     now = timezone.now()
@@ -17,6 +17,13 @@ def get_today():
     day = now.day
 
     return datetime.date(year, month, day)
+
+@api_view(["GET"])
+def get_categories(request):
+    categories = Category.objects.all()
+    serializer = CategorySerializer(categories, many=True)
+    return Response(serializer.data)
+
 
 class ChoreViewSet(viewsets.ModelViewSet):
     queryset = Chore.objects.all()

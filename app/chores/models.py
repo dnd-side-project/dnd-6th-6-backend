@@ -59,6 +59,12 @@ class Day(models.Model):
 
 
 class RepeatChore(models.Model):
+
+    class allocation_method(models.IntegerChoices):
+        FIX = 1
+        ORDER = 2
+        RANDOM = 3
+
     information = models.OneToOneField(
         ChoreInfo,
         on_delete=models.CASCADE
@@ -67,5 +73,8 @@ class RepeatChore(models.Model):
         User,
         related_name="repeat_chores",
         related_query_name="has_repeat_chores"
+    )
+    allotcaion_method = models.PositiveSmallIntegerField(
+        allocation_method
     )
     days = models.ManyToManyField(Day)

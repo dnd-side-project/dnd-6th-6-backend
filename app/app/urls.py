@@ -19,7 +19,7 @@ from rest_framework import routers
 from django.conf import settings
 from django.conf.urls.static import static
 
-from chores.views import ChoreViewSet, RepeatChoreViewSet
+from chores.views import ChoreViewSet, RepeatChoreViewSet, get_categories
 from comments.views import CommentChoreViewSet, CommentRepeatChoreViewSet
 from favor.views import FavorViewSet
 from feedbacks.views import FeedbackViewSet
@@ -41,6 +41,7 @@ urlpatterns = [
     path("houses/", include("houses.urls")),
     path("notifications/", include("notifications.urls")),
     path("users/", include("users.urls")),
+    path("categories", get_categories)
 ]
 
 
