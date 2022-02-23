@@ -6,7 +6,7 @@ from users.serializers import UserSerializer
 class HouseSerializer(serializers.ModelSerializer):
     class Meta:
         model = House
-        fields = ["id", "name"]
+        fields = ["id", "name", "created_at"]
 
 
 class InviteSerializer(serializers.ModelSerializer):

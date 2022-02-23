@@ -17,7 +17,6 @@ class Notice(models.Model):
         related_name="notices",
         related_query_name="notice"
     )
-    title = models.CharField(max_length=255)
     content = models.TextField()
     writed_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
