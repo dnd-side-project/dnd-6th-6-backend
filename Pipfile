@@ -6,11 +6,14 @@ name = "pypi"
 [packages]
 django = "*"
 djangorestframework = "*"
+pillow = "*"
+django-allauth = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 httpie = "*"
-django-allauth = "*"
-pillow = "*"
+pipenv-to-requirements = "*"
+awsebcli = "*"
 
 [requires]
 python_version = "3.8"
