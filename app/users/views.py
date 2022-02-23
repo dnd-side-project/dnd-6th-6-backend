@@ -81,7 +81,8 @@ def password(request):  # request signup_email , password, ck_password
     serializer = CreateUserSerializer(data=request.data)
 
     if serializer.is_valid(raise_exception=True):
-        serializer.save(request.data)
+        serializer.save(request.data)  # 유효성 검사
+
         return Response(status=status.HTTP_200_OK)  # 성공
     else:
         return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -93,12 +94,21 @@ def password(request):  # request signup_email , password, ck_password
 @permission_classes([AllowAny])
 def profile(request):
     serializer = SignupProfileSerializer(data=request.data)
+
     # request signup_email, name
     if serializer.is_valid():
         serializer.save()
-        return Response(status=status.HTTP_200_OK)  # 성공
     else:
         return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    user = USERS.objects.filter(username=request.data["signup_email"])[0]
+    user_ser = UserSerializer(user)
+    token = Token.objects.get_or_create(user=user)
+
+    return Response(
+        data={"token": token[0].key, "user": user_ser.data},
+        status=status.HTTP_200_OK,
+    )  # 성공
 
 
 ##로그인##
