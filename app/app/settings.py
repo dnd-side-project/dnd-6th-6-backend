@@ -168,7 +168,7 @@ CORS_ALLOW_CREDENTIALS = True  # True일 경우 모든 도메인 허용, whiteli
 
 #
 # secrets.json
-secret_file = os.path.join(BASE_DIR, "roundtable_secrets\secrets.json")
+secret_file = os.path.join(BASE_DIR, "secrets.json")
 
 with open(secret_file) as f:
     secrets = json.loads(f.read())

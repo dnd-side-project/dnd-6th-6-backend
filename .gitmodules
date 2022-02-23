@@ -1,3 +1,0 @@
-[submodule "app/roundtable_secrets"]
-	path = app/roundtable_secrets
-	url = https://github.com/yejin0528/roundtable_secrets.git
