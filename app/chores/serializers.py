@@ -3,7 +3,7 @@ from rest_framework import serializers
 from chores.models import Category, ChoreInfo, Chore, Day,RepeatChore
 from houses.serializers import HouseSerializer
 from users.serializers import UserSerializer
-from comments.serializers import CommentChoreSerializer
+from comments.serializers import CommentChoreSerializer, CommentRepeatChoreSerializer
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -38,7 +38,8 @@ class RepeatChoreSerializer(serializers.ModelSerializer):
     information = ChoreInfoSerializer()
     assignees = UserSerializer(read_only=True, many=True)
     days = DaySerializer(read_only=True, many=True)
+    comments = CommentRepeatChoreSerializer(read_only=True, many=True)
 
     class Meta:
         model = RepeatChore
-        fields = ["id", "information", "assignees", "days"]
+        fields = ["id", "information", "assignees", "days", "comments"]
