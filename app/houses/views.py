@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from houses.models import Invite
 from houses.serializers import HouseSerializer, InviteSerializer
+from users.serializers import UserSerializer
 
 
 @api_view(["POST"])
@@ -68,3 +69,12 @@ def accept_invite(request):
     request.user.user_profile.house = invite.house
     request.user.user_profile.save()
     return Response(status=status.HTTP_200_OK)
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_members(request):
+    members = User.objects.filter(
+        user_profile__house=request.user.user_profile.house
+    ).exclude(id=request.user.id)
+    serializer = UserSerializer(members, many=True)
+    return Response(serializer.data)
