@@ -29,6 +29,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "44Mi1F5npxUFfZhUepT")
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "ec2-13-125-38-145.ap-northeast-2.compute.amazonaws.com",
+    "13.125.38.145",
 ]
 
 if os.environ.get("IS_DEPLOIED"):
