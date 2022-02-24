@@ -39,7 +39,7 @@ def invite_member(request):
         except:
             return Response("email required", status=status.HTTP_400_BAD_REQUEST)
 
-        invitee = get_object_or_404(User, email=email)
+        invitee = get_object_or_404(User, username=email)
         serializer = InviteSerializer(data={})
         if serializer.is_valid():
             serializer.save(
