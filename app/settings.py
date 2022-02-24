@@ -26,7 +26,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY", "44Mi1F5npxUFfZhUepT")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-ALLOWED_HOSTS = ["127.0.0.1"]
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "ec2-13-125-38-145.ap-northeast-2.compute.amazonaws.com",
+]
+
 if os.environ.get("IS_DEPLOIED"):
     DEBUG = False
     ALLOWED_HOSTS.append("round-table.ap-northeast-2.elasticbeanstalk.com")
