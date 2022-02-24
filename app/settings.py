@@ -209,3 +209,7 @@ SOCIAL_OUTH_CONFIG = {
     "NAVER_REDIRECT_URI": get_secret("NAVER_REDIRECT_URI"),
     "NAVER_SECRET_KEY": get_secret("NAVER_SECRET_KEY"),
 }
+
+##ec2
+# python3 manage.py collectstatic
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
