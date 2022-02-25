@@ -84,16 +84,13 @@ def get_notifications(request):
 @api_view(["PATCH"])
 def check_notification(request, pk):
     try:
-        _type = request.data["type"]
+        _type = request.GET["type"]
     except KeyError:
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
     if _type=="notice":
         notification = get_object_or_404(NotificationNotice, pk=pk, to=request.user)
         serializer_class = NotificationNoticeSerializer
-    elif _type=="invite":
-        notification = get_object_or_404(NotificationInvite, pk=pk, invite__invitee=request.user)
-        serializer_class = NotificationInviteSerializer
     elif _type=="feedback":
         notification = get_object_or_404(NotificationFeedback, pk=pk, to=request.user)
         serializer_class = NotificationFeedbackSerializer

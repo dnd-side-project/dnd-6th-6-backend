@@ -26,12 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY", "44Mi1F5npxUFfZhUepT")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-ALLOWED_HOSTS = [
-    "127.0.0.1",
-    "ec2-13-125-38-145.ap-northeast-2.compute.amazonaws.com",
-    "13.125.38.145",
-]
-
+ALLOWED_HOSTS = ["127.0.0.1"]
 if os.environ.get("IS_DEPLOIED"):
     DEBUG = False
     ALLOWED_HOSTS.append("round-table.ap-northeast-2.elasticbeanstalk.com")
@@ -50,12 +45,15 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
+THIRD_APPS = [
+    "rest_framework",
+    "django_crontab"
+]
 
 MY_APPS = [
     # cors
     "corsheaders",
     # app
-    "rest_framework",
     "houses",
     "users",
     "chores",
@@ -72,7 +70,7 @@ MY_APPS = [
 ]
 
 
-INSTALLED_APPS = DJANGO_APPS + MY_APPS
+INSTALLED_APPS = DJANGO_APPS + THIRD_APPS + MY_APPS
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",  # cors
@@ -211,6 +209,6 @@ SOCIAL_OUTH_CONFIG = {
     "NAVER_SECRET_KEY": get_secret("NAVER_SECRET_KEY"),
 }
 
-##ec2
-# python3 manage.py collectstatic
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+CRON_JOBS = [
+    ("0 0 * * 1", "app.cron.add_chore_auto", ">>crontab.log")
+]

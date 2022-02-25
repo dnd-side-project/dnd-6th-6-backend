@@ -15,7 +15,7 @@ class FeedbackViewSet(
 
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
-    permission_classes = [IsAuthenticated, IsHouseMember]
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, chore_id, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -29,8 +29,11 @@ class FeedbackViewSet(
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
     def list(self, request, chore_id, *args, **kwargs):
+
         queryset = self.filter_queryset(self.get_queryset())
-        queryset = queryset.filter(chore_id=chore_id)
+        queryset = queryset.filter(
+            chore__assignees=request.user
+        )
         
         page = self.paginate_queryset(queryset)
         if page is not None:
