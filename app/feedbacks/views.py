@@ -29,17 +29,10 @@ class FeedbackViewSet(
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
     def list(self, request, chore_id, *args, **kwargs):
-        try:
-            start_dt = request.GET["start_dt"]
-            end_dt = request.GET["end_dt"]
-        except KeyError:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
 
         queryset = self.filter_queryset(self.get_queryset())
         queryset = queryset.filter(
-            chore__assignees=request.user,
-            sended_at__gte=start_dt,
-            sended_at__lte=end_dt
+            chore__assignees=request.user
         )
         
         page = self.paginate_queryset(queryset)
