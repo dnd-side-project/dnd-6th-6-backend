@@ -40,16 +40,10 @@ def invite_member(request):
             return Response("email required", status=status.HTTP_400_BAD_REQUEST)
 
         invitee = get_object_or_404(User, username=email)
-        serializer = InviteSerializer(data={})
-        if serializer.is_valid():
-            serializer.save(
-                house=house,
-                inviter=request.user,
-                invitee=invitee
-            )
-            response.append(serializer.data)
+        invitee.user_profile.house = house
+        invitee.user_profile.save()
     
-    return Response(response, status=status.HTTP_201_CREATED)
+    return Response({"message": "success"}, status=status.HTTP_201_CREATED)
     
 
 

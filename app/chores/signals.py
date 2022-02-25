@@ -18,8 +18,8 @@ def add_chore(instance, action, **kwargs):
         today_week = today.weekday() + 1
         
         for day in days:
-            if today_week>=day.id:
-                day.id += 7
+            if today_week>day.id:
+                continue
             days_delta = day.id - today_week
             planned_at = repeat_chore.planned_at
             next_planned_at = datetime.datetime(
@@ -38,7 +38,19 @@ def add_chore(instance, action, **kwargs):
             if method == choices.FIX:
                 next_assignees = assignees
             elif method == choices.ORDER:
-                next_assignees = [assignees[0]]
+                if information.chores.all().exists():
+                    last_chore = information.chores.last()
+                    last_chore_assignees = last_chore.assignees.all()
+                    for i, assignee in enumerate(assignees):
+                        if assignee==last_chore_assignees.first():
+                            if i+1==len(assignees):
+                                next_assignees = [assignees[0]]
+                            else:
+                                next_assignees = [assignees[i+1]]
+                            break
+                else:
+                    next_assignees = [assignees[0]]
+
             elif method == choices.RANDOM:
                 next_assignees = get_assignees_by_random(assignees)
         
