@@ -15,7 +15,7 @@ class FeedbackViewSet(
 
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
-    permission_classes = [IsAuthenticated, IsHouseMember]
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, chore_id, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

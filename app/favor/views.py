@@ -18,7 +18,7 @@ class FavorViewSet(
 
     queryset = Favor.objects.all()
     serializer_class = FavorSerializer
-    permission_classes = [IsAuthenticated, IsHouseMember]
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, chore_id, *args, **kwargs):
         get_object_or_404(request.user.chores, pk=chore_id)
@@ -49,7 +49,7 @@ class FavorViewSet(
         
         queryset = self.filter_queryset(self.get_queryset())
         queryset = queryset.filter(
-            _from=request.user,
+            to=request.user,
             sended_at__gte=start_dt,
             sended_at__lte=end_dt
         )
