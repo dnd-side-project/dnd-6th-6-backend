@@ -16,7 +16,7 @@ def get_today():
     month = now.month
     day = now.day
 
-    return datetime.date(year, month, day)
+    return datetime.datetime(year, month, day, 0, 0, 0)
 
 @api_view(["GET"])
 def get_categories(request):
