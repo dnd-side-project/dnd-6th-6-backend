@@ -48,7 +48,7 @@ class Chore(models.Model):
         return f"{self.assignees}'s {self.information}"
     
     class Meta:
-        ordering = ["-planned_at"]
+        ordering = ["planned_at"]
 
 
 class Day(models.Model):
