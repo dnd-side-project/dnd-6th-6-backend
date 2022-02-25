@@ -22,7 +22,7 @@ class Notice(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.content
+        return self.title
     
     class Meta:
         ordering = ["-writed_at"]

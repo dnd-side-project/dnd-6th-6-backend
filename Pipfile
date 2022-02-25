@@ -9,7 +9,6 @@ djangorestframework = "*"
 pillow = "*"
 django-allauth = "*"
 django-cors-headers = "*"
-django-crontab = "*"
 
 [dev-packages]
 httpie = "*"

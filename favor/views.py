@@ -18,7 +18,7 @@ class FavorViewSet(
 
     queryset = Favor.objects.all()
     serializer_class = FavorSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsHouseMember]
 
     def create(self, request, chore_id, *args, **kwargs):
         get_object_or_404(request.user.chores, pk=chore_id)
@@ -41,11 +41,8 @@ class FavorViewSet(
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
     def list(self, request, chore_id, *args, **kwargs):
-        
         queryset = self.filter_queryset(self.get_queryset())
-        queryset = queryset.filter(
-            to=request.user
-        )
+        queryset = queryset.filter(chore_id=chore_id)
         
         page = self.paginate_queryset(queryset)
         if page is not None:

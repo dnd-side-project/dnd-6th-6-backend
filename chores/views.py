@@ -16,7 +16,7 @@ def get_today():
     month = now.month
     day = now.day
 
-    return datetime.datetime(year, month, day, 0, 0, 0)
+    return datetime.date(year, month, day)
 
 @api_view(["GET"])
 def get_categories(request):
@@ -31,18 +31,12 @@ class ChoreViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsHouseMember]
 
     def list(self, request, house_id, *args, **kwargs):
-        try:
-            start_dt = request.GET["start_dt"]
-            end_dt = request.GET["end_dt"]
-        except KeyError:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        
+        today = get_today()
         queryset = self.filter_queryset(self.get_queryset())
         queryset_for_house = queryset.filter(
             information__house_id=house_id,
             information__repeatchore__isnull=True,
-            planned_at__gte=start_dt,
-            planned_at__lte=end_dt
+            planned_at__gte=today
         )
 
         page = self.paginate_queryset(queryset_for_house)
@@ -167,31 +161,6 @@ class ChoreViewSet(viewsets.ModelViewSet):
         
         serializer = self.get_serializer(queryset_for_house, many=True)
         return Response(serializer.data)
-    
-    @action(methods=["GET"], detail=False)
-    def completed(self, request, house_id, *args, **kwargs):
-        try:
-            start_dt = request.GET["start_dt"]
-            end_dt = request.GET["end_dt"]
-        except KeyError:
-            return Response({"message": "기간 파라미터 필요"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        queryset = self.filter_queryset(self.get_queryset())
-        queryset = queryset.filter(
-            assignees=request.user,
-            completed_at__gte=start_dt,
-            completed_at__lte=end_dt
-        )
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-    
-    @action(methods=["PATCH"], detail=True)
-    def complete(self, request, house_id, *args, **kwargs):
-        chore = self.get_object()
-        chore.completed_at = datetime.datetime.now()
-        chore.save()
-        return Response(status=status.HTTP_200_OK)
-
 
 
 class RepeatChoreViewSet(viewsets.ModelViewSet):

@@ -11,13 +11,11 @@ from notices.models import Notice
 from houses.models import Invite
 from feedbacks.models import Feedback
 from favor.models import Favor
-from users.models import Profile
 
 @receiver(post_save, sender=Notice)
 def create_notification_notice(sender, instance, created, **kwargs):
     if created:
-        profiles = Profile.objects.filter(house=instance.house)
-        for profile in profiles:
+        for profile in instance.house.profile.all():
             if profile.user == instance.writer:
                 continue
             notification = NotificationNotice(notice=instance, to=profile.user)
@@ -30,7 +28,7 @@ def create_notification_invite(sender, instance, created, **kwargs):
         notification.save()
 
 @receiver(post_save, sender=Feedback)
-def create_notification_feedback(sender, instance, created, **kwargs):
+def create_notification_notice(sender, instance, created, **kwargs):
     if created:
         for assignee in instance.chore.assignees.all():
             notification = NotificationFeedback(feedback=instance, to=assignee)

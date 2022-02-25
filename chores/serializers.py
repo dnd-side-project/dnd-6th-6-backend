@@ -42,4 +42,4 @@ class RepeatChoreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RepeatChore
-        fields = ["id", "information", "assignees", "days", "comments", "allocation_method", "planned_at"]
+        fields = ["id", "information", "assignees", "days", "comments", "allotcaion_method"]

@@ -13,7 +13,6 @@ from users.views import (
     naver_login,
     naver_callback,
     mypage_profile,
-    find_password_email,
 )
 
 # users/
@@ -36,7 +35,6 @@ urlpatterns = [
     path("", user_list),
     path("<int:pk>", user_detail),
     path("email", auth_email),
-    path("email/password", find_password_email),
     path("code", auth_code),
     path("password", password),
     path("profile", profile),

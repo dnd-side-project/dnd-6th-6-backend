@@ -7,7 +7,7 @@ class Category(models.Model):
     name = models.CharField(max_length=10, unique=True)
 
     def __str__(self):
-        return f"{self.id}: {self.name}"
+        return self.name
 
 class ChoreInfo(models.Model):
     name = models.CharField(max_length=255)
@@ -48,19 +48,19 @@ class Chore(models.Model):
         return f"{self.assignees}'s {self.information}"
     
     class Meta:
-        ordering = ["planned_at"]
+        ordering = ["-planned_at"]
 
 
 class Day(models.Model):
     name = models.CharField(max_length=2)
 
     def __str__(self):
-        return f"{self.id}: {self.name}"
+        return self.name
 
 
 class RepeatChore(models.Model):
 
-    class AllocationMethod(models.IntegerChoices):
+    class allocation_method(models.IntegerChoices):
         FIX = 1
         ORDER = 2
         RANDOM = 3
@@ -74,8 +74,7 @@ class RepeatChore(models.Model):
         related_name="repeat_chores",
         related_query_name="has_repeat_chores"
     )
-    allocation_method = models.PositiveSmallIntegerField(
-        choices=AllocationMethod.choices
+    allotcaion_method = models.PositiveSmallIntegerField(
+        allocation_method
     )
     days = models.ManyToManyField(Day)
-    planned_at = models.TimeField()

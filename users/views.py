@@ -1,6 +1,5 @@
 from app.settings import SOCIAL_OUTH_CONFIG
 from django.contrib.auth import get_user_model, authenticate
-from django.contrib.auth.hashers import make_password
 from rest_framework import viewsets, status
 from rest_framework.decorators import (
     api_view,
@@ -16,7 +15,6 @@ from .serializers import (
     CreateUserSerializer,
     SignupProfileSerializer,
     ProfileSerializer,
-    send_code,
 )
 from .models import EmailAuth, Profile
 
@@ -29,7 +27,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 ##회원가입##
-# 1. 인증코드 전송 이메일 - 회원 가입
+# 1. 인증코드 전송 이메일 - 회원 가입, 비밀번호 찾기
 @api_view(["POST"])
 @authentication_classes([])
 @permission_classes([AllowAny])
@@ -47,16 +45,6 @@ def auth_email(request):  # signtup_email
         return Response(status=status.HTTP_200_OK)  # 전송
     else:
         return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-## 인증코드 전송 - 비밀번호 찾기##
-@api_view(["POST"])
-@authentication_classes([])
-@permission_classes([AllowAny])
-def find_password_email(request):  # login_email
-    login_email = request.data["login_email"]
-    send_code(login_email)
-    return Response(status=status.HTTP_200_OK)
 
 
 # 2. 인증코드 인증
@@ -85,29 +73,19 @@ def auth_code(request):  # request code
         )  # 실패
 
 
-# {"signup_email":"tester","password":"xptmxj1234!","ck_password":"xptmxj1234!"}
 # 3. 패스워드 입력 - 회원가입, 비밀번호 찾기
-@api_view(["POST", "PUT"])
+@api_view(["POST"])
 @authentication_classes([])
 @permission_classes([AllowAny])
 def password(request):  # request signup_email , password, ck_password
     serializer = CreateUserSerializer(data=request.data)
 
-    if request.method == "POST":
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()  # 유효성 검사
+    if serializer.is_valid(raise_exception=True):
+        serializer.save(request.data)  # 유효성 검사
 
-            return Response(status=status.HTTP_200_OK)  # 성공
-        else:
-            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    else:  # PUT
-        if serializer.is_valid(raise_exception=True):
-            user = USERS.objects.filter(username=request.data["signup_email"])
-            hash_pw = make_password(request.data["password"])
-            user.update(password=hash_pw)
-            return Response(status=status.HTTP_200_OK)  # 성공
-        else:
-            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_200_OK)  # 성공
+    else:
+        return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # 4. 프로필 입력 - 이름
