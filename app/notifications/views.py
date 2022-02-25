@@ -91,9 +91,6 @@ def check_notification(request, pk):
     if _type=="notice":
         notification = get_object_or_404(NotificationNotice, pk=pk, to=request.user)
         serializer_class = NotificationNoticeSerializer
-    elif _type=="invite":
-        notification = get_object_or_404(NotificationInvite, pk=pk, invite__invitee=request.user)
-        serializer_class = NotificationInviteSerializer
     elif _type=="feedback":
         notification = get_object_or_404(NotificationFeedback, pk=pk, to=request.user)
         serializer_class = NotificationFeedbackSerializer
