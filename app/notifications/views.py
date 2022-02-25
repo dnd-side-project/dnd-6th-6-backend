@@ -84,7 +84,7 @@ def get_notifications(request):
 @api_view(["PATCH"])
 def check_notification(request, pk):
     try:
-        _type = request.data["type"]
+        _type = request.GET["type"]
     except KeyError:
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
