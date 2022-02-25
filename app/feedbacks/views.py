@@ -37,7 +37,6 @@ class FeedbackViewSet(
 
         queryset = self.filter_queryset(self.get_queryset())
         queryset = queryset.filter(
-            chore_id=chore_id,
             chore__assignees=request.user,
             sended_at__gte=start_dt,
             sended_at__lte=end_dt
