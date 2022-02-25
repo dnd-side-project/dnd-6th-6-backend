@@ -169,7 +169,7 @@ class ChoreViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
     @action(methods=["GET"], detail=False)
-    def complete(self, request, house_id, *args, **kwargs):
+    def completed(self, request, house_id, *args, **kwargs):
         try:
             start_dt = request.GET["start_dt"]
             end_dt = request.GET["end_dt"]
@@ -184,6 +184,13 @@ class ChoreViewSet(viewsets.ModelViewSet):
         )
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+    
+    @action(methods=["PATCH"], detail=True)
+    def complete(self, request, house_id, *args, **kwargs):
+        chore = self.get_object()
+        chore.completed_at = datetime.datetime.now()
+        chore.save()
+        return Response(status=status.HTTP_200_OK)
 
 
 
