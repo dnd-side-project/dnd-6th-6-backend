@@ -11,7 +11,7 @@ from houses.models import House
 
 ##회원가입-프로필##
 class SignupProfileSerializer(serializers.ModelSerializer):
-    signup_email = serializers.CharField(max_length=20)  # 이메일
+    signup_email = serializers.EmailField()  # 이메일
     name = serializers.CharField(max_length=10)  # 이름
 
     def create(self, validated_data):
@@ -86,7 +86,7 @@ def send_code(auth_email):
 
 ##회원가입-패스워드##
 class CreateUserSerializer(serializers.Serializer):
-    signup_email = serializers.CharField(max_length=40)
+    signup_email = serializers.EmailField()
     password = serializers.CharField(max_length=20, required=True)
     ck_password = serializers.CharField(max_length=20, required=True)
 
