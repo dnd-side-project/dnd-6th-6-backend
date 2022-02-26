@@ -47,7 +47,7 @@ DJANGO_APPS = [
 
 THIRD_APPS = [
     "rest_framework",
-    "django_crontab"
+    "django_crontab",
 ]
 
 MY_APPS = [
@@ -164,6 +164,7 @@ CORS_ORIGIN_WHITELIST = [
     # 허용 호스트
     "http://127.0.0.1:3000",
     "http://localhost:3000",
+    "http://roundtable-react.s3-website.ap-northeast-2.amazonaws.com/",
 ]
 
 CORS_ALLOW_CREDENTIALS = True  # True일 경우 모든 도메인 허용, whitelist 사용X
@@ -210,5 +211,5 @@ SOCIAL_OUTH_CONFIG = {
 }
 
 CRON_JOBS = [
-    ("0 0 * * 1", "app.cron.add_chore_auto", ">>crontab.log")
+    ("0 0 * * 1", "app.cron.add_chore_auto", ">>crontab.log"),
 ]
