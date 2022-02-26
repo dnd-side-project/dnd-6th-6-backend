@@ -29,7 +29,6 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "44Mi1F5npxUFfZhUepT")
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "ec2-13-125-38-145.ap-northeast-2.compute.amazonaws.com",
-    "13.125.38.145",
 ]
 
 if os.environ.get("IS_DEPLOIED"):
@@ -50,12 +49,12 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
+THIRD_APPS = ["rest_framework", "django_crontab"]
 
 MY_APPS = [
     # cors
     "corsheaders",
     # app
-    "rest_framework",
     "houses",
     "users",
     "chores",
@@ -72,7 +71,7 @@ MY_APPS = [
 ]
 
 
-INSTALLED_APPS = DJANGO_APPS + MY_APPS
+INSTALLED_APPS = DJANGO_APPS + THIRD_APPS + MY_APPS
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",  # cors
@@ -210,6 +209,8 @@ SOCIAL_OUTH_CONFIG = {
     "NAVER_REDIRECT_URI": get_secret("NAVER_REDIRECT_URI"),
     "NAVER_SECRET_KEY": get_secret("NAVER_SECRET_KEY"),
 }
+
+CRON_JOBS = [("0 0 * * 1", "app.cron.add_chore_auto", ">>crontab.log")]
 
 ##ec2
 # python3 manage.py collectstatic

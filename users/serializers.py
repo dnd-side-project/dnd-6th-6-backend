@@ -11,7 +11,7 @@ from houses.models import House
 
 ##회원가입-프로필##
 class SignupProfileSerializer(serializers.ModelSerializer):
-    signup_email = serializers.CharField(max_length=20)  # 이메일
+    signup_email = serializers.EmailField()  # 이메일
     name = serializers.CharField(max_length=10)  # 이름
 
     def create(self, validated_data):
@@ -66,25 +66,27 @@ class EmailAuthSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         signup_email = validated_data["signup_email"]
-        code = self.__send_code(signup_email)
+        code = send_code(signup_email)
         emailauth = EmailAuth(signup_email=signup_email, code=code)
         emailauth.save()
         return emailauth
 
-    # 인증코드 전송
-    def __send_code(self, auth_email):
-        code = str(uuid.uuid4())[:6]  # 초대코드
-        auth_email = EmailMessage(
-            "Rountable 회원가입 인증코드",  # 제목
-            "인증코드: " + code,  # 본문
-            to=[auth_email],  # 수신자 이메일
-        )
-        auth_email.send()
-        return code
+
+# 인증코드 전송
+def send_code(auth_email):
+    code = str(uuid.uuid4())[:6]  # 초대코드
+    auth_email = EmailMessage(
+        "Rountable 회원가입 인증코드",  # 제목
+        "인증코드: " + code,  # 본문
+        to=[auth_email],  # 수신자 이메일
+    )
+    auth_email.send()
+    return code
 
 
 ##회원가입-패스워드##
 class CreateUserSerializer(serializers.Serializer):
+    signup_email = serializers.EmailField()
     password = serializers.CharField(max_length=20, required=True)
     ck_password = serializers.CharField(max_length=20, required=True)
 
@@ -113,7 +115,7 @@ class CreateUserSerializer(serializers.Serializer):
         else:
             return data
 
-    def save(self, validated_data):  # 회원가입
+    def create(self, validated_data):  # 회원가입
         signup_email = validated_data["signup_email"]
         password = validated_data["password"]
         user = User(username=signup_email)
