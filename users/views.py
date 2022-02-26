@@ -219,6 +219,7 @@ from urllib.parse import urlparse
 
 
 @api_view(["GET"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def naver_callback(request):
     ##Access Token Request##
@@ -275,6 +276,7 @@ def naver_callback(request):
 
 
 @api_view(["GET"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def kakao_login(request):
     ##Code Request##
@@ -283,6 +285,7 @@ def kakao_login(request):
 
 
 @api_view(["GET"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def kakao_callback(request):
     ##Access Token Request##

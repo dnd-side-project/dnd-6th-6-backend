@@ -76,7 +76,7 @@ class EmailAuthSerializer(serializers.ModelSerializer):
 def send_code(auth_email):
     code = str(uuid.uuid4())[:6]  # 초대코드
     auth_email = EmailMessage(
-        "Rountable 회원가입 인증코드",  # 제목
+        "Roundtable 회원가입 인증코드",  # 제목
         "인증코드: " + code,  # 본문
         to=[auth_email],  # 수신자 이메일
     )
